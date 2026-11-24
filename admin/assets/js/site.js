@@ -55,66 +55,15 @@
 
   /* ---------- 4. hero ---------- */
   function renderHero() {
-    if ($("heroKicker")) $("heroKicker").textContent = S.heroKicker || "MEGA DEAL";
-    if ($("heroTitle")) $("heroTitle").textContent = S.heroTitle || "Buy 2 Get 1 Free on all AI tools";
-    if ($("heroSubtitle")) $("heroSubtitle").textContent = S.heroSubtitle || "Premium AI tools at the lowest prices in Pakistan. Instant delivery on WhatsApp.";
-    
-    var heroImgEl = $("heroImg");
-    if (heroImgEl) {
-      var posterSrc = S.heroImage || "assets/img/posters/poster-h-chatgpt.webp";
-      if (!posterSrc.includes("-h-") && !posterSrc.includes("-p-")) {
-        posterSrc = "assets/img/posters/poster-h-chatgpt.webp";
-      }
-      heroImgEl.innerHTML = 
-        '<div class="hero-deal-card-3d">' +
-          '<div class="hero-card-shine-wrap">' +
-            '<div class="hero-live-badge">🔥 MEGA DEAL • 60% OFF</div>' +
-            '<img src="' + esc(posterSrc) + '" alt="ChatGPT Plus AI Suite" class="hero-featured-poster" onerror="this.src=\'assets/img/posters/poster-h-chatgpt.webp\'">' +
-            '<div class="hero-continuous-shine"></div>' +
-          '</div>' +
-          '<div class="hero-deal-footer">' +
-            '<div class="hero-deal-title-row">' +
-              '<span class="hero-deal-tag">⚡ LIMITED TIME OFFER</span>' +
-              '<span class="hero-deal-status">● Live Now</span>' +
-            '</div>' +
-            '<div class="hero-timer-box">' +
-              '<div class="hero-timer-title">ENDS IN:</div>' +
-              '<div class="hero-timer-digits">' +
-                '<div class="cd-slot"><span id="cdH">14</span><label>HRS</label></div>' +
-                '<span class="cd-colon">:</span>' +
-                '<div class="cd-slot"><span id="cdM">35</span><label>MIN</label></div>' +
-                '<span class="cd-colon">:</span>' +
-                '<div class="cd-slot"><span id="cdS">42</span><label>SEC</label></div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      startHeroCountdown();
-    }
-
-    var chips = (S.heroTrustChips || ["⚡ 45 Min Delivery", "🛡️ Warranty Included", "💳 JazzCash / Easypaisa"]).filter(Boolean);
-    if ($("heroChips")) {
-      $("heroChips").innerHTML = chips.map(function (c) {
-        return '<span class="hero-chip">' + esc(c) + "</span>";
-      }).join("");
-    }
-  }
-
-  var cdTimerStarted = false;
-  function startHeroCountdown() {
-    if (cdTimerStarted) return;
-    cdTimerStarted = true;
-    var h = 14, m = 35, s = 42;
-    setInterval(function() {
-      s--;
-      if (s < 0) { s = 59; m--; }
-      if (m < 0) { m = 59; h--; }
-      if (h < 0) { h = 23; }
-      var hEl = $("cdH"), mEl = $("cdM"), sEl = $("cdS");
-      if (hEl) hEl.textContent = (h < 10 ? "0" : "") + h;
-      if (mEl) mEl.textContent = (m < 10 ? "0" : "") + m;
-      if (sEl) sEl.textContent = (s < 10 ? "0" : "") + s;
-    }, 1000);
+    $("heroKicker").textContent = S.heroKicker || "";
+    $("heroTitle").textContent = S.heroTitle || "";
+    $("heroSubtitle").textContent = S.heroSubtitle || "";
+    var heroSrc = S.heroImage || "assets/img/logos/chatgpt-plus.jpg";
+    $("heroImg").innerHTML = imgTag(heroSrc, "Offer");
+    var chips = (S.heroTrustChips || []).filter(Boolean);
+    $("heroChips").innerHTML = chips.map(function (c) {
+      return '<span class="hero-chip">' + esc(c) + "</span>";
+    }).join("");
   }
 
   /* ---------- 4b. stats strip ---------- */
@@ -215,30 +164,19 @@
     var activeIdx = p.activeVariationIndex || 0;
     var activeVar = vars[activeIdx] || vars[0];
 
-    var pct = (activeVar.oldPrice > activeVar.price) ? Math.round(((activeVar.oldPrice - activeVar.price) / activeVar.oldPrice) * 100) : 0;
-    
-    // Top-Left Badges (Competitor Style)
-    var tlBadges = [];
-    if (p.bestSeller || (p.sold && p.sold > 15) || p.id.indexOf("chatgpt") !== -1 || p.id.indexOf("canva") !== -1 || p.id.indexOf("surfshark") !== -1) {
-      tlBadges.push('<span class="card-badge is-bestseller">🔥 Best Seller</span>');
-    }
-    if (pct >= 15) {
-      tlBadges.push('<span class="card-badge is-save">Save ' + pct + '%</span>');
-    }
-
-    // Bottom image overlay badges (Competitor Style)
-    var stockText = (p.stock === 0) ? 'Out of Stock' : 'In Stock • 30-60m';
-    var dotColor = (p.stock === 0) ? '#EF4444' : '#22C55E';
-    var pkgText = (vars.length > 1) ? ('📦 ' + vars.length + ' Packages') : ('📦 ' + (activeVar.duration || '1 Month'));
-
+    var pct = offPct(activeVar.price ? activeVar : p);
+    var badges = "";
+    if (p.bestSeller) badges += '<span class="best-badge">🔥 Best Seller</span>';
+    if (p.sold > 0) badges += '<span class="sold-badge">' + p.sold + " Sold</span>";
+    if (p.stock === 0) badges += '<span class="stock-badge">Stock End</span>';
+    if (p.trial && p.stock !== 0) badges += '<span class="trial-badge">🎁 Trial</span>';
+    var savePill = (pct > 0) ? '<span class="save-badge">Save ' + pct + "%</span>" : "";
     var meta = [];
     if (p.accessType) meta.push("🔒 " + esc(p.accessType));
     if (p.warranty) meta.push("🛡️ " + esc(p.warranty));
-
     var priceTxt = (activeVar.price > 0) ? window.RT.money(activeVar.price) : "💬 Price on WhatsApp";
-    var oldPriceTxt = (activeVar.oldPrice > activeVar.price) ? '<span class="price-old" id="pold-' + esc(p.id) + '">' + window.RT.money(activeVar.oldPrice) + '</span>' : '';
-    
-    // Duration selector pills (1M, 6M, 12M etc.)
+
+    // Duration selector pills (if multi-offers exist like ChatGPT Semi/Full)
     var durationPills = "";
     if (vars.length > 1) {
       durationPills = '<div class="card-duration-selector" data-id="' + esc(p.id) + '">';
@@ -255,38 +193,28 @@
       ? '<a class="btn btn-green" id="wbtn-' + esc(p.id) + '" data-act="order" href="' + waLink("A.o.a, is " + p.name + " available?") + '" target="_blank" rel="noopener">💬 Ask on WhatsApp</a>'
       : '<a class="btn btn-green" id="wbtn-' + esc(p.id) + '" data-act="order" href="' + waLink(waMsg) + '" target="_blank" rel="noopener">💬 Order on WhatsApp</a>';
 
-    var inWish = (typeof getWish === 'function' && getWish().indexOf(p.id) !== -1);
-
     return '<div class="card" data-id="' + esc(p.id) + '">' +
-      '<div class="card-img">' +
-        (tlBadges.length ? '<div class="card-badges-tl">' + tlBadges.join('') + '</div>' : '') +
-        '<div class="card-actions-tr">' +
-          '<button type="button" class="card-circle-btn" data-act="wish" data-id="' + esc(p.id) + '" title="Wishlist">' + (inWish ? '❤️' : '🤍') + '</button>' +
-          '<button type="button" class="card-circle-btn" data-act="details" title="View details">👁️</button>' +
-        '</div>' +
-        imgTag(p.img, p.name) +
-        '<div class="card-img-bottom-bar">' +
-          '<span class="card-stock-pill"><i class="stock-dot" style="background:' + dotColor + ';box-shadow:0 0 8px ' + dotColor + '"></i><span>' + stockText + '</span></span>' +
-          '<span class="card-pkg-pill" id="ppkg-' + esc(p.id) + '">' + esc(pkgText) + '</span>' +
-        '</div>' +
-      '</div>' +
+      '<div class="card-img"><div class="card-badges">' + badges + "</div>" + savePill + imgTag(p.img, p.name) + "</div>" +
       '<div class="card-body">' +
         '<div class="card-cat">' + esc(p.category || "") + "</div>" +
         '<div class="card-name">' + esc(p.name) + "</div>" +
         (meta.length ? '<div class="card-meta">' + meta.join(" • ") + "</div>" : "") +
         (p.about ? '<div class="card-desc">' + esc(p.about) + "</div>" : "") +
         durationPills +
-        '<div class="price-block"><span class="price-label">' + (vars.length > 1 ? "SELECTED DURATION PRICE" : "PLAN PRICE") + '</span>' +
+        '<div class="price-block"><span class="price-label">' + (vars.length > 1 ? "SELECTED PLAN" : (p.startingAt ? "STARTING AT" : "PLAN PRICE")) + '</span>' +
         '<div class="price-row"><span class="price" id="pprice-' + esc(p.id) + '">' + priceTxt + "</span>" +
-        oldPriceTxt +
-        '<span class="validity" id="pval-' + esc(p.id) + '">🕐 ' + esc(activeVar.duration) + "</span></div></div>" +
+        (activeVar.oldPrice > activeVar.price ? '<span class="price-old" id="pold-' + esc(p.id) + '">' + window.RT.money(activeVar.oldPrice) + '</span>' : "") +
+        (activeVar.duration ? '<span class="validity" id="pval-' + esc(p.id) + '">🕐 ' + esc(activeVar.duration) + "</span>" : "") +
+        "</div></div>" +
         '<div class="card-actions">' +
+          '<button class="btn btn-outline" data-act="details">ⓘ View Details</button>' +
           orderBtn +
-          '<button class="btn btn-outline" data-act="quickadd" type="button" onclick="window.quickAddProductWithVariation(\'' + esc(p.id) + '\')">🛒 Add</button>' +
-          '<button class="btn btn-outline" data-act="details" type="button">Details</button>' +
         "</div>" +
-      "</div>" +
-    "</div>";
+        '<div class="card-quick">' +
+          '<button class="btn btn-outline btn-sm" data-act="quickadd" onclick="window.quickAddProductWithVariation(\'' + esc(p.id) + '\')">＋ Quick Add</button>' +
+          '<button class="btn btn-outline btn-sm wish-btn' + (isWished(p.id) ? " wished" : "") + '" data-act="wish">' + (isWished(p.id) ? "♥ Wishlisted" : "♡ Wishlist") + "</button>" +
+        "</div>" +
+      "</div></div>";
   }
 
   // Global helper for interactive duration selection

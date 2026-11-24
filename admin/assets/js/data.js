@@ -2677,7 +2677,7 @@ window.DEFAULT_SETTINGS = {
 
 /* ---------- shared store helpers (used by site.js and admin.js) ---------- */
 window.Store = (function () {
-  var KEY = "rehmat_site_v6";
+  var KEY = "rehmat_site_v7";
   function deepCopy(o) { return JSON.parse(JSON.stringify(o)); }
   return {
     KEY: KEY,
@@ -2685,10 +2685,6 @@ window.Store = (function () {
       var fresh = { products: deepCopy(window.DEFAULT_PRODUCTS), settings: deepCopy(window.DEFAULT_SETTINGS), courses: deepCopy(window.DEFAULT_COURSES || []), reviews: [], proofs: [] };
       try {
         var raw = localStorage.getItem(KEY);
-        if (!raw) {
-          // Check for previous version keys
-          raw = localStorage.getItem("rehmat_site_v3") || localStorage.getItem("rehmat_site_v2") || localStorage.getItem("rehmat_site_v1");
-        }
         if (raw) {
           var s = JSON.parse(raw);
           if (s && s.settings) {
