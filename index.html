@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rehmat Tools | Premium Digital Tools</title>
+<meta name="description" content="Shop trusted premium digital tools, subscriptions, and productivity bundles from Rehmat Tools. Delivery Time is 45 minutes✨✨. Our All AI tools come with 100% genuine access and warranty.">
+<link rel="canonical" href="https://rehmattools.store/">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Rehmat Tools">
+<meta property="og:title" content="Rehmat Tools | Premium Digital Tools">
+<meta property="og:description" content="Shop trusted premium digital tools, subscriptions, and productivity bundles from Rehmat Tools. Delivery Time is 45 minutes✨✨.">
+<meta property="og:image" content="https://rehmattools.store/assets/img/logo.jpeg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rehmat Tools | Premium Digital Tools">
+<meta name="twitter:description" content="Shop trusted premium digital tools, subscriptions, and productivity bundles from Rehmat Tools. Delivery Time is 45 minutes✨✨.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- 1. TOP TICKER -->
+<div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+
+<!-- 2. STICKY HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/img/logo.jpeg" alt="Rehmat Tools logo" onerror="this.style.display='none'">
+      <span class="brand-name">REHMAT TOOLS</span>
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="#top">Home</a>
+      <a href="#products">Tools</a>
+      <a href="#courses">Courses</a>
+      <a href="#reviews">Reviews</a>
+      <a href="admin/index.html" style="color: #1D4ED8; font-weight: 700;">⚙️ Admin</a>
+      <a href="#howto">About</a>
+    </nav>
+    <div class="search-box">
+      <input id="searchInput" type="search" placeholder="Search tools… (e.g. ChatGPT, Netflix, VPN)">
+    </div>
+    <button class="cart-btn" id="cartBtn" aria-label="Cart">🛒 <span class="cart-count" id="cartCount">0</span></button>
+    <a class="btn btn-green" id="headerWaBtn" href="#" target="_blank" rel="noopener">💬 Order on WhatsApp</a>
+  </div>
+</header>
+
+<!-- 3. CATEGORY PILLS -->
+<nav class="cats" id="catPills" aria-label="Categories"></nav>
+
+<main class="wrap">
+
+  <!-- 4. HERO -->
+  <section class="hero">
+    <div class="hero-box">
+      <div class="hero-copy">
+        <div class="hero-kicker" id="heroKicker"></div>
+        <h1 class="hero-title" id="heroTitle"></h1>
+        <p class="hero-sub" id="heroSubtitle"></p>
+        <div class="avail-badge">🕐 24 hours available for you — all guidance free</div>
+        <div class="hero-chips" id="heroChips"></div>
+        <div class="hero-cta-btns">
+          <a class="btn btn-light" href="#products">Grab Deal <span class="arr">→</span></a>
+          <a class="btn btn-green" id="heroWaDirect" href="https://wa.me/923147505963?text=A.o.a%20Rehmat%20Tools%2C%20I%20want%20the%20Mega%20Deal%20(Buy%202%20Get%201%20Free)!" target="_blank" rel="noopener">💬 Order on WhatsApp</a>
+        </div>
+      </div>
+      <div class="hero-showcase" id="heroImg"></div>
+    </div>
+  </section>
+
+  <!-- 4a. OUR PROMISE -->
+  <section class="promise-band">
+    <div class="promise-inner">
+      <span class="promise-kicker">— OUR PROMISE</span>
+      <h2>Everything you need to <span>create and grow</span> —<br>without <span>overpaying.</span></h2>
+      <div class="promise-bar"><div style="width:100%"></div></div>
+      <span class="promise-pct">100% genuine access</span>
+    </div>
+  </section>
+
+  <!-- 4b. STATS -->
+  <section class="stats-strip" id="heroStats"></section>
+
+  <!-- 4c. FEATURED DEAL -->
+  <section class="section" id="featuredDeal"></section>
+
+  <!-- 4d. TRUST BAR -->
+  <div class="trustbar" id="trustBar"><div class="trustbar-track" id="trustBarTrack"></div></div>
+
+  <!-- 5. TOOLS MARQUEE -->
+  <section class="marquee-section" aria-label="All tools">
+    <div class="marquee"><div class="marquee-track" id="marqueeTrack"></div></div>
+  </section>
+
+  <!-- 6. PRODUCTS -->
+  <section class="section" id="products">
+    <div class="section-head">
+      <h2 class="section-title">Products</h2>
+      <span class="sample-tag">live catalogue</span>
+    </div>
+    <div class="pop-searches" id="popSearches"></div>
+    <div class="prod-count" id="prodCount"></div>
+    <div class="coupon-strip" id="couponStrip" style="display:none"></div>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <!-- 7. FREE TRIAL -->
+  <section class="section" id="trial">
+    <div class="section-head">
+      <h2 class="section-title">🎁 FREE TRIAL AVAILABLE</h2>
+      <span class="sample-tag">try before you buy</span>
+    </div>
+    <p class="trial-sub">Explore selected AI tools before purchasing. Request your free trial through WhatsApp.</p>
+    <div class="grid" id="trialGrid"></div>
+  </section>
+
+  <!-- 7b. COURSES -->
+  <section class="section" id="courses">
+    <div class="section-head">
+      <h2 class="section-title">🎓 Courses</h2>
+      <span class="sample-tag">learn &amp; earn</span>
+    </div>
+    <div class="course-search">
+      <input id="courseSearch" type="search" placeholder="Search courses… (e.g. YouTube Automation, TikTok, Ecommerce)">
+      <span class="course-count" id="courseCount"></span>
+    </div>
+    <nav class="cats course-cats" id="courseCats" aria-label="Course categories"></nav>
+    <div class="grid" id="courseGrid"></div>
+  </section>
+
+  <!-- 7c. FEATURES -->
+  <section class="section" id="featuresSec">
+    <div class="section-head">
+      <h2 class="section-title">Everything Included</h2>
+      <span class="sample-tag">why rehmat tools</span>
+    </div>
+    <div class="feat-grid" id="featureGrid"></div>
+  </section>
+
+  <!-- 8. GUIDANCE BAND -->
+  <section class="section">
+    <div class="guide-band">
+      <h2 id="guidanceTitle"></h2>
+      <p id="guidanceText"></p>
+      <a class="btn btn-green" id="guidanceBtn" href="#" target="_blank" rel="noopener">💬 WhatsApp par Guidance Lein</a>
+    </div>
+  </section>
+
+  <!-- 8b. FAQ -->
+  <section class="section" id="faqSec">
+    <div class="section-head">
+      <h2 class="section-title">❓ Got Questions?</h2>
+    </div>
+    <div id="faqList"></div>
+  </section>
+
+  <!-- 8c. FINAL CTA -->
+  <section class="section">
+    <div class="cta-band">
+      <h2 id="ctaTitle"></h2>
+      <p id="ctaText"></p>
+      <div class="cta-btns">
+        <a class="btn btn-light" href="#products">Browse All Tools →</a>
+        <a class="btn btn-green" id="ctaWa" href="#" target="_blank" rel="noopener">💬 Contact on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. REVIEWS -->
+  <!-- 8b. HOW TO PURCHASE -->
+  <section class="section" id="howto">
+    <div class="section-head">
+      <h2 class="section-title">How to Purchase in 3 Simple Steps</h2>
+      <span class="sample-tag">transparent ordering</span>
+    </div>
+    <p class="section-sub">Every order follows a clear, verified three-step process with local PKR payment options and 45-minute delivery.</p>
+    <div class="steps-grid" id="howSteps"></div>
+    <div class="pay-accounts" id="payAccounts"></div>
+  </section>
+
+  <!-- 9. REVIEWS -->
+  <section class="section" id="reviews">
+    <div class="section-head">
+      <h2 class="section-title">What Our <span style="color:var(--green)">Customers Say</span></h2>
+      <button class="btn btn-green btn-sm" id="writeReviewBtn">✍️ Write a Review</button>
+    </div>
+    <p class="section-sub" id="reviewsSub"></p>
+    <nav class="cats rev-cats" id="revTabs" aria-label="Review tabs"></nav>
+    <div class="rev-stats" id="revStats"></div>
+    <div class="rev-breakdown" id="revBreakdown"></div>
+    <div class="rev-filter" id="revFilter" style="display:none">
+      <label>Filter by product:</label>
+      <select id="revProduct"></select>
+    </div>
+    <div class="grid rev-grid" id="reviewGrid"></div>
+    <div class="proofs-wrap" id="proofsWrap" style="display:none">
+      <p class="section-sub">🔒 Privacy Protected: customer phone numbers, emails &amp; bank IDs are redacted in all screenshots.</p>
+      <div class="proofs-grid" id="proofsGrid"></div>
+    </div>
+    <p id="revEmpty" class="rev-empty" style="display:none">No reviews yet — be the first to share your experience.</p>
+  </section>
+
+  <!-- 9b. WRITE A REVIEW (overlay) -->
+  <div class="overlay" id="reviewOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <button class="modal-close" id="reviewClose" aria-label="Close">✕</button>
+      <h2 style="font-size:20px;font-weight:800;margin-bottom:6px">✍️ Write a Review</h2>
+      <p style="font-size:13.5px;color:#6b6455;margin-bottom:14px">Your review is published only after admin approval. Only genuine reviews are shown.</p>
+      <form id="reviewForm">
+        <div class="field"><label>Your name *</label><input id="rvName" required maxlength="60" placeholder="e.g. Ali Hassan"></div>
+        <div class="field"><label>City</label><input id="rvCity" maxlength="40" placeholder="e.g. Lahore"></div>
+        <div class="field"><label>Product *</label><select id="rvProduct"></select></div>
+        <div class="field"><label>Rating *</label><select id="rvRating">
+          <option value="5">★★★★★ 5 — Excellent</option>
+          <option value="4">★★★★☆ 4 — Very good</option>
+          <option value="3">★★★☆☆ 3 — Good</option>
+          <option value="2">★★☆☆☆ 2 — Poor</option>
+          <option value="1">★☆☆☆☆ 1 — Bad</option>
+        </select></div>
+        <div class="field"><label>Your review *</label><textarea id="rvComment" rows="3" required maxlength="500" placeholder="How was your experience?"></textarea></div>
+        <button class="btn btn-green" type="submit" style="width:100%">Submit Review</button>
+        <p id="rvMsg" style="margin-top:10px;font-size:13px;color:var(--green);display:none">Thanks! Your review was submitted and will appear after admin approval.</p>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<!-- 10. FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">
+        <img src="assets/img/logo.jpeg" alt="Rehmat Tools" onerror="this.style.display='none'">
+        <span>REHMAT TOOLS</span>
+      </div>
+      <p id="footerAbout">100% trusted and verified AI tools with complete honesty and transparency. Premium tools at the lowest prices in Pakistan — instant delivery on WhatsApp.</p>
+      <h4 style="margin-top:18px">Need Help? WhatsApp Us</h4>
+      <div class="wa-box">
+        <div><div class="wa-box-lbl">WhatsApp Number</div><div class="wa-box-num">0314-7505963</div></div>
+        <a class="btn btn-green btn-sm" id="waChatNow" href="#" target="_blank" rel="noopener">💬 Chat Now</a>
+      </div>
+      <p id="footerEmail" style="margin-top:10px"></p>
+      <p id="footerPays" style="margin-top:6px"></p>
+    </div>
+    <div>
+      <h4>CATEGORIES</h4>
+      <ul id="footerCats"></ul>
+    </div>
+    <div>
+      <h4>COMPANY</h4>
+      <ul>
+        <li><a href="#products">Our Products</a></li>
+        <li><a href="#courses">Digital Courses</a></li>
+        <li><a href="#reviews">Customer Reviews</a></li>
+        <li><a id="trackOrderLink" href="#" target="_blank" rel="noopener">Track Order</a></li>
+        <li><a id="channelFooterLink" href="#" target="_blank" rel="noopener">WhatsApp Channel</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>LEGAL &amp; POLICIES</h4>
+      <ul id="footerPolicies"></ul>
+    </div>
+  </div>
+  <div class="footer-stats" id="footerStats"></div>
+  <div class="footer-pop" id="footerPop"></div>
+  <div class="footer-notice"><h4>🛡️ Refund Policy &amp; Replacement Warranty Notice</h4><p id="refundNoticeText"></p><p class="footer-policy-links" id="footerPolicyLinks"></p></div>
+  <div class="footer-trust" id="footerTrust"></div>
+  <div class="footer-bottom">© 2026 Rehmat Tools · All rights reserved · <a href="admin/" target="_blank" rel="noopener">Admin</a></div>
+</footer>
+
+<!-- 10a. CART DRAWER -->
+<div class="overlay" id="cartOverlay" role="dialog" aria-modal="true">
+  <div class="modal cart-modal">
+    <button class="modal-close" id="cartClose" aria-label="Close">✕</button>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:12px">🛒 Your Cart</h2>
+    <div class="cart-tabs">
+      <button class="pill active" data-ctab="cart">Cart (<span id="cartTabCount">0</span>)</button>
+      <button class="pill" data-ctab="wish">♡ Wishlist (<span id="wishTabCount">0</span>)</button>
+    </div>
+    <div id="cartList"></div>
+    <div id="wishList" style="display:none"></div>
+    <div class="cart-total" id="cartTotal"></div>
+    <a class="btn btn-green" id="cartWaBtn" href="#" target="_blank" rel="noopener" style="width:100%;text-align:center">💬 Order on WhatsApp</a>
+    <p style="font-size:12.5px;color:#8a8271;margin-top:10px;text-align:center">Payment is verified on WhatsApp — advance payment required.</p>
+  </div>
+</div>
+
+<!-- 10b. POLICY MODAL -->
+<div class="overlay" id="policyOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="modal-close" id="policyClose" aria-label="Close">✕</button>
+    <h2 id="policyTitle" style="font-size:20px;font-weight:800;margin-bottom:12px"></h2>
+    <p id="policyText" style="font-size:14.5px;line-height:1.7"></p>
+  </div>
+</div>
+
+<!-- 11. WELCOME MODAL -->
+<div class="overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="modal">
+    <button class="modal-close" id="welcomeClose" aria-label="Close">✕</button>
+    <h2 id="welcomeTitle" style="font-size:22px;font-weight:800"></h2>
+    <div class="welcome-lines" id="welcomeLines"></div>
+    <label class="dont-show"><input type="checkbox" id="dontShow"> Don't show again</label>
+    <button class="btn btn-dark" id="welcomeCloseBtn" style="width:100%">Close</button>
+  </div>
+</div>
+
+<!-- 12. PRODUCT DETAILS MODAL -->
+<div class="overlay" id="detailsOverlay" role="dialog" aria-modal="true">
+  <div class="modal wide">
+    <button class="modal-close" id="detailsClose" aria-label="Close">✕</button>
+    <div id="detailsBody"></div>
+  </div>
+</div>
+
+<!-- 13. FLOATING ELEMENTS -->
+<div class="watching-pill"><span class="dot">🟢</span><b>21</b> watching now</div>
+<div class="social-toast" id="socialToast"></div>
+
+<div class="channel-popup" id="channelPopup">
+  <button class="cp-close" id="channelClose" aria-label="Close">✕</button>
+  <h4>🎁 Join our WhatsApp Channel</h4>
+  <ul>
+    <li>✦ Exclusive member-only discounts</li>
+    <li>✦ Flash deals &amp; free giveaways</li>
+    <li>✦ Priority premium support</li>
+  </ul>
+  <a class="btn btn-dark" id="channelJoin" href="#" target="_blank" rel="noopener" style="width:100%">Join &amp; Unlock Offers</a>
+</div>
+
+<div class="coupon-widget" id="couponWidget" style="display:none">
+  <button class="cp-close" id="couponWidgetClose" aria-label="Close">✕</button>
+  <div class="cw-title">🎟️ Special Discount Coupon</div>
+  <div class="cw-code"><span id="cwCode"></span><button class="btn btn-dark btn-sm" id="cwCopy">Copy</button></div>
+  <div class="cw-sub" id="cwSub"></div>
+</div>
+
+<a class="wa-fab" id="waFab" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.4.7 4.6 1.9 6.5L4 29l7.7-1.8c1.8 1 3.9 1.6 6.1 1.6h.2c6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.9 0-3.7-.5-5.3-1.5l-.4-.2-4.5 1.1 1.2-4.4-.3-.4c-1-1.6-1.6-3.5-1.6-5.5C5.1 9.4 10.4 4.5 16 4.5S26.9 9.4 26.9 15 21.6 24.8 16 24.8zm5.4-7.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2-.2-.3 0-.5.2-.7.2-.2.3-.3.5-.5.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.2-.7-1.7-.9-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.2-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg>
+</a>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/site.js"></script>
+<script>
+  // wire the second welcome close button (same behaviour as ✕)
+  document.getElementById('welcomeCloseBtn').addEventListener('click', function () {
+    document.getElementById('welcomeClose').click();
+  });
+</script>
+
+  <!-- CLAIM FREE COURSE MODAL -->
+  <div id="claimCourseModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #FFFFFF; border-radius: 20px; max-width: 500px; width: 100%; padding: 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative; text-align: center;">
+      <button onclick="closeClaimCourseModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: #6B7280;">✕</button>
+      <div style="width: 58px; height: 58px; border-radius: 50%; background: #DCFCE7; color: #16A34A; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        🎓
+      </div>
+      <span id="claimCourseCategory" style="font-size: 11px; font-weight: 800; color: #2563EB; text-transform: uppercase;">CATEGORY</span>
+      <h3 id="claimCourseTitle" style="font-size: 19px; font-weight: 900; margin: 6px 0 10px; color: #111827;">Course Title</h3>
+      <p id="claimCourseMeta" style="font-size: 12px; color: #6B7280; margin-bottom: 20px;">28 Hours Video • 64 Lessons</p>
+
+      <div style="background: #FAF7F2; border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px; text-align: left; font-size: 12px; color: #4B5563; margin-bottom: 22px;">
+        <div style="margin-bottom: 6px;"><strong>✓ High-Speed Google Drive Access</strong></div>
+        <div style="margin-bottom: 6px;"><strong>✓ Downloadable Video Lessons & Source Code</strong></div>
+        <div><strong>✓ 100% Free Lifetime Access for Rehmat Tools Users</strong></div>
+      </div>
+
+      <a id="btnClaimDriveLink" href="#" target="_blank" rel="noopener" style="display: block; width: 100%; background: #1D4ED8; color: #FFFFFF; padding: 13px; border-radius: 999px; font-weight: 800; font-size: 14px; text-decoration: none; margin-bottom: 10px; box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);">
+        📂 Open Google Drive Folder & Download
+      </a>
+      <button onclick="window.open('https://wa.me/923000000000?text=Assalam-o-Alaikum%20Rehmat%20Tools!%20Need%20help%20with%20free%20courses%20drive.', '_blank')" style="background: transparent; border: none; color: #16A34A; font-size: 13px; font-weight: 700; cursor: pointer;">
+        💬 Need help? Message on WhatsApp
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>

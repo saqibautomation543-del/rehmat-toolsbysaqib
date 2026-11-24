@@ -1,0 +1,10 @@
+# Rehmat Tools Admin — server-level password protection
+# Bina sahi username/password ke /admin ka koi file nahi khulega.
+AuthType Basic
+AuthName "Rehmat Tools Admin"
+# >>> ZAROORI: neeche wali line me apna FULL server path dalo.
+# Hostinger File Manager kholo — upar path dikhega, e.g.
+# /home/u123456789/domains/rehmattools.store/public_html
+# Us path ko copy karke end me /admin/.htpasswd lagao:
+AuthUserFile /home/uXXXXXXX/domains/rehmattools.store/public_html/admin/.htpasswd
+Require valid-user

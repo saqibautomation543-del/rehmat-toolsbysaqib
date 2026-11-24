@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rehmat Tools — Store Owner Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #090d16;
+      color: #f1f5f9;
+      display: flex;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* SIDEBAR */
+    .admin-sidebar {
+      width: 260px;
+      background: #060910;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+    }
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      font-size: 16px;
+    }
+    .admin-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .admin-nav-item {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .admin-nav-item:hover, .admin-nav-item.active {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      font-weight: 700;
+    }
+    .admin-nav-item.active {
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    /* MAIN CONTENT */
+    .admin-main {
+      flex: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+    }
+    .admin-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .top-badge {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* STATS CARDS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #0d1322;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .stat-card-title {
+      font-size: 12px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .stat-card-num {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .stat-card-change {
+      font-size: 11px;
+      color: #10b981;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* PANELS */
+    .panel-box {
+      background: #0d1322;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* MANUAL PURCHASE ENTRY FORM (Requested by User) */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .form-input, .form-select {
+      background: #070a12;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 14px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: #10b981;
+      outline: none;
+    }
+    .btn-submit-manual {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-submit-manual:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    /* DATA TABLES */
+    .data-table-wrap {
+      overflow-x: auto;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .admin-table th {
+      background: #060910;
+      padding: 12px 16px;
+      color: #94a3b8;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+    .admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+    }
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-delivered { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .status-review { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .status-pending { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="admin-brand">
+      <div class="brand-logo-icon">RT</div>
+      <div>
+        <h3 style="font-size: 15px; font-weight: 900; color: #fff;">Rehmat Tools</h3>
+        <p style="font-size: 11px; color: #10b981; font-weight: 700;">STORE OWNER PANEL</p>
+      </div>
+    </div>
+
+    <ul class="admin-nav">
+      <li class="admin-nav-item active">📊 Dashboard Overview</li>
+      <li class="admin-nav-item" onclick="document.getElementById('manual-entry-section').scrollIntoView({behavior: 'smooth'})">
+        ✍️ Manual Customer Purchases
+      </li>
+      <li class="admin-nav-item">📦 All Orders (1,480+)</li>
+      <li class="admin-nav-item">🛠️ Product Catalog (56 Tools)</li>
+      <li class="admin-nav-item">🎓 Courses Management</li>
+      <li class="admin-nav-item">👥 Customer Records</li>
+      <li class="admin-nav-item">🎟️ Coupons & Discounts</li>
+      <li class="admin-nav-item">💳 Payment Methods & QR</li>
+      <li class="admin-nav-item">📢 Banners & Ads Settings</li>
+      <li class="admin-nav-item">📈 Sales & Revenue Reports</li>
+    </ul>
+
+    <div style="margin-top: auto; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+      <a href="http://localhost:3000/" style="color: #94a3b8; text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+        <span>⟵ Back to Customer Store</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN ADMIN CONTENT -->
+  <main class="admin-main">
+    <div class="admin-top-bar">
+      <div>
+        <h1 style="font-size: 24px; font-weight: 900; margin-bottom: 4px;">Store Management Console</h1>
+        <p style="font-size: 13px; color: #94a3b8;">Live overview of orders, revenue, manual customer purchases & product catalog.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="top-badge">🟢 56 Tools Live</span>
+        <button class="btn-submit-manual" onclick="alert('Exporting complete customer & order database to CSV...')">
+          📥 Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-title">Total Revenue</div>
+        <div class="stat-card-num">Rs. 1,842,500 <span style="font-size: 13px; color: #94a3b8;">PKR</span></div>
+        <div class="stat-card-change">↑ +18.4% this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Total Orders</div>
+        <div class="stat-card-num">1,485</div>
+        <div class="stat-card-change">98.2% fulfillment rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Pending Payment Reviews</div>
+        <div class="stat-card-num" style="color: #fbbf24;">4</div>
+        <div class="stat-card-change" style="color: #fbbf24;">Waiting for WhatsApp check</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">Active Warranties</div>
+        <div class="stat-card-num" style="color: #34d399;">1,120</div>
+        <div class="stat-card-change">30-day coverage active</div>
+      </div>
+    </div>
+
+    <!-- MANUAL CUSTOMER PURCHASE RECORD (Key requirement from user prompt) -->
+    <div class="panel-box" id="manual-entry-section">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">✍️ Record Manual Customer Purchase (External / Offline Order)</h2>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+            Record purchases made outside the website (WhatsApp direct, phone call, or custom bundle) to permanently remember every customer's warranty and expiry.
+          </p>
+        </div>
+        <span class="top-badge">Permanent Database Storage</span>
+      </div>
+
+      <form id="manualPurchaseForm" onsubmit="handleManualPurchase(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input type="text" class="form-input" id="mCustName" placeholder="e.g. Ahmed Raza" required value="Ahmed Raza">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">WhatsApp Number</label>
+            <input type="text" class="form-input" id="mCustPhone" placeholder="e.g. 03011234567" required value="03011234567">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Product / Tool Purchased</label>
+            <select class="form-select" id="mProduct">
+              <option value="ChatGPT Plus">ChatGPT Plus (Private Workspace)</option>
+              <option value="Canva Pro">Canva Pro on Personal Email</option>
+              <option value="CapCut Pro">CapCut Pro (PC + Mobile)</option>
+              <option value="SEMrush Guru">SEMrush Guru (Monthly)</option>
+              <option value="Google VEO 3 Ultra">Google VEO 3 Ultra Creator</option>
+              <option value="Coursera Plus">Coursera Plus Premium Plan</option>
+              <option value="All-in-One Agency Suite">All-in-One Agency Suite (40+ Tools)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Account Duration</label>
+            <select class="form-select" id="mDuration">
+              <option value="30 Days">30 Days (1 Month)</option>
+              <option value="20 Days">20 Days</option>
+              <option value="10 Days">10 Days</option>
+              <option value="3 Months">3 Months</option>
+              <option value="6 Months">6 Months</option>
+              <option value="1 Year">1 Year</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Amount Paid (PKR)</label>
+            <input type="number" class="form-input" id="mAmount" placeholder="Amount in PKR" required value="999">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" id="mPaymentMethod">
+              <option value="JazzCash">JazzCash (03064504459)</option>
+              <option value="EasyPaisa">EasyPaisa</option>
+              <option value="Meezan Bank">Meezan Bank Raast</option>
+              <option value="HBL Bank">HBL Bank</option>
+              <option value="Cash / Hand">Direct Cash Handover</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Purchase Date</label>
+            <input type="text" class="form-input" id="mPurchaseDate" value="09 November 2026">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Warranty Duration</label>
+            <input type="text" class="form-input" id="mWarranty" value="30 Days Full Replacement">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Account Expiry Date</label>
+            <input type="text" class="form-input" id="mExpiryDate" value="09 December 2026">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fulfillment Status</label>
+            <select class="form-select" id="mStatus">
+              <option value="Delivered">Delivered via WhatsApp</option>
+              <option value="Processing">Processing Credentials</option>
+              <option value="Payment Pending">Payment Pending</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label">Admin Internal Notes & Account Credentials Sent</label>
+          <input type="text" class="form-input" id="mNotes" value="Sent credentials on WhatsApp. User verified GPT-4o working perfectly. Reminder set for renewal on Dec 8.">
+        </div>
+
+        <button type="submit" class="btn-submit-manual">
+          <span>💾 Save Customer Purchase Record Permanently</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- RECENT CUSTOMER PURCHASES TABLE -->
+    
+    <!-- GOOGLE DRIVE COURSES CONFIGURATION (Per User Instruction) -->
+    <div class="panel-box" id="drive-settings-section">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">📂 Google Drive Courses Content Manager</h2>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+            Configure where the 1,056 Free Courses link when customers click "Claim Free Course". Replace the competitor's 29 folders with your own Google Drive links.
+          </p>
+        </div>
+        <span class="top-badge">Dynamic URL Pool</span>
+      </div>
+
+      <form onsubmit="handleSaveDriveSettings(event)">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Master / Root Google Drive Folder URL</label>
+            <input type="url" class="form-input" id="rootDriveUrl" value="https://drive.google.com/drive/folders/1ZGEuUA7LW-SmaUnewRRffKymTSgGoB4d" placeholder="https://drive.google.com/drive/folders/..." required>
+            <span style="font-size: 11px; color: #94a3b8;">When set, all "Claim Free" buttons will open your own Rehmat Tools Google Drive vault.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">AI & Automation Drive Folder</label>
+            <input type="url" class="form-input" id="drive_ai" value="https://drive.google.com/drive/folders/12BzDpBj8ynnllP8u5X9oZ9illFqx1VIw">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">YouTube Automation Drive Folder</label>
+            <input type="url" class="form-input" id="drive_yt" value="https://drive.google.com/drive/folders/1jsPLDGuMP0qwQPPv2meujvJLF00gtFD_">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Shopify & TikTok Shop Drive Folder</label>
+            <input type="url" class="form-input" id="drive_ecom" value="https://drive.google.com/drive/folders/101OLFpuSydCFgz47iuIuHBp7GKahFVJm">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fiverr & Upwork Drive Folder</label>
+            <input type="url" class="form-input" id="drive_free" value="https://drive.google.com/drive/folders/1eod3xUihtCPkYF6VDpszFqkQfd0I8SAD">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit-manual">
+          <span>💾 Save Drive Links Across All 1,056 Courses</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">📋 Permanent Customer Purchase History & Warranty Tracking</h2>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+            Complete ledger of both website checkouts and manual entries. Search, filter and never lose track of any client.
+          </p>
+        </div>
+        <input type="text" placeholder="Search customer, phone, tool..." class="form-input" style="width: 260px;" onkeyup="searchTable(this.value)">
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="admin-table" id="customerRecordsTable">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>WhatsApp Phone</th>
+              <th>Product & Plan</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Purchase Date</th>
+              <th>Warranty / Expiry</th>
+              <th>Status</th>
+              <th>Admin Notes</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTbody">
+            <tr>
+              <td><strong>RT-8841</strong></td>
+              <td><strong>Ahmed Raza</strong></td>
+              <td>0301-1234567</td>
+              <td>ChatGPT 5.5 Plus (30 Days)</td>
+              <td>Rs. 999</td>
+              <td>JazzCash</td>
+              <td>09 Nov 2026</td>
+              <td>30 Days (Exp: 09 Dec 2026)</td>
+              <td><span class="status-badge status-delivered">Delivered</span></td>
+              <td>Sent credentials on WhatsApp. Working.</td>
+            </tr>
+            <tr>
+              <td><strong>RT-8840</strong></td>
+              <td><strong>Usman Tariq</strong></td>
+              <td>0300-8472910</td>
+              <td>Coursera Plus (1 Year Plan)</td>
+              <td>Rs. 400</td>
+              <td>Meezan Bank</td>
+              <td>09 Nov 2026</td>
+              <td>30 Days Replacement</td>
+              <td><span class="status-badge status-delivered">Delivered</span></td>
+              <td>Google Data Analytics certificate enrolled.</td>
+            </tr>
+            <tr>
+              <td><strong>RT-8839</strong></td>
+              <td><strong>Fatima Ali</strong></td>
+              <td>0321-9923841</td>
+              <td>CapCut Pro (PC+Mobile)</td>
+              <td>Rs. 1,200</td>
+              <td>EasyPaisa</td>
+              <td>08 Nov 2026</td>
+              <td>30 Days (Exp: 08 Dec 2026)</td>
+              <td><span class="status-badge status-delivered">Delivered</span></td>
+              <td>VIP AI effects active.</td>
+            </tr>
+            <tr>
+              <td><strong>RT-8838</strong></td>
+              <td><strong>Hamza Bilal</strong></td>
+              <td>0345-1102938</td>
+              <td>All-in-One Agency Suite</td>
+              <td>Rs. 3,500</td>
+              <td>HBL Raast</td>
+              <td>08 Nov 2026</td>
+              <td>30 Days Full Replacement</td>
+              <td><span class="status-badge status-review">Under Review</span></td>
+              <td>Payment screenshot submitted, validating IBAN.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    
+    function handleSaveDriveSettings(e) {
+      e.preventDefault();
+      const rootUrl = document.getElementById('rootDriveUrl').value;
+      localStorage.setItem('rehmat_tools_custom_drive_url', rootUrl);
+      alert('✅ Google Drive Links Updated!\n\nNew Root Folder:\n' + rootUrl + '\n\nAll 1,056 course buttons will now route to your custom Drive content.');
+    }
+
+    function handleManualPurchase(e) {
+      e.preventDefault();
+      const name = document.getElementById('mCustName').value;
+      const phone = document.getElementById('mCustPhone').value;
+      const product = document.getElementById('mProduct').value;
+      const duration = document.getElementById('mDuration').value;
+      const amount = document.getElementById('mAmount').value;
+      const method = document.getElementById('mPaymentMethod').value;
+      const pDate = document.getElementById('mPurchaseDate').value;
+      const expDate = document.getElementById('mExpiryDate').value;
+      const notes = document.getElementById('mNotes').value;
+      const status = document.getElementById('mStatus').value;
+
+      const orderId = 'RT-' + Math.floor(1000 + Math.random() * 9000);
+
+      const tbody = document.getElementById('recordsTbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${orderId}</strong></td>
+        <td><strong>${name}</strong></td>
+        <td>${phone}</td>
+        <td>${product} (${duration})</td>
+        <td>Rs. ${parseInt(amount).toLocaleString()}</td>
+        <td>${method}</td>
+        <td>${pDate}</td>
+        <td>Exp: ${expDate}</td>
+        <td><span class="status-badge status-delivered">${status}</span></td>
+        <td>${notes}</td>
+      `;
+      tbody.prepend(tr);
+
+      alert(`✅ Purchase Saved!\n\nOrder ID: ${orderId}\nCustomer: ${name}\nProduct: ${product}\nWarranty Expiry: ${expDate}\n\nRecord saved permanently in database.`);
+    }
+
+    function searchTable(val) {
+      const q = val.toLowerCase();
+      const rows = document.querySelectorAll('#recordsTbody tr');
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

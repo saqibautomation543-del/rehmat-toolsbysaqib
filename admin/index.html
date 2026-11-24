@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Rehmat Tools</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="admin-body">
+
+<!-- LOGIN GATE -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>🔐 Admin Panel</h1>
+    <p>Rehmat Tools — restricted area.<br>Demo auth — client-side only.</p>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginPw">Password</label>
+        <input type="password" id="loginPw" placeholder="Enter admin password" autocomplete="current-password">
+      </div>
+      <button class="btn btn-dark" type="submit" style="width:100%">Login</button>
+    </form>
+    <p style="margin-top:14px;font-size:12px">Default password: <b>rehmat123</b> (change it in Settings)</p>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div class="admin-shell" id="adminShell">
+  <div class="admin-top">
+    <div class="ttl">🛠️ Rehmat Tools <span>Admin</span></div>
+    <div>
+      <a class="btn btn-outline btn-sm" href="index.html" target="_blank" rel="noopener" style="margin-right:8px">View site</a>
+      <button class="btn btn-sm" id="logoutBtn" style="background:#333;color:#fff;border:none">Logout</button>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="paneDashboard">Dashboard</button>
+    <button class="tab" data-tab="paneProducts">Products</button>
+    <button class="tab" data-tab="paneBulk">Bulk Import</button>
+    <button class="tab" data-tab="paneText">Website Text</button>
+    <button class="tab" data-tab="paneHomepage">Homepage</button>
+    <button class="tab" data-tab="paneCourses">Courses</button>
+    <button class="tab" data-tab="paneReviews">Reviews</button>
+    <button class="tab" data-tab="paneProofs">Proofs</button>
+    <button class="tab" data-tab="paneCoupons">Coupons</button>
+    <button class="tab" data-tab="panePayments">Payments</button>
+    <button class="tab" data-tab="paneSettings">Settings</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section class="tabpane active" id="paneDashboard">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="lbl">Total Visitors</div><div class="val" id="statVisitors"></div></div>
+      <div class="stat-card"><div class="lbl">Online Now</div><div class="val" id="statOnline"></div></div>
+      <div class="stat-card"><div class="lbl">Orders</div><div class="val" id="statOrders"></div></div>
+      <div class="stat-card"><div class="lbl">Revenue</div><div class="val" id="statRevenue"></div></div>
+    </div>
+    <div class="note-box">📊 These are <b>demo</b> numbers. Real stats need a backend — connect later.</div>
+    <div class="panel-card">
+      <h3>Quick actions</h3>
+      <div class="btn-row">
+        <button class="btn btn-dark btn-sm" onclick="document.querySelector('[data-tab=paneProducts]').click()">Manage products</button>
+        <button class="btn btn-outline btn-sm" onclick="document.querySelector('[data-tab=paneBulk]').click()">Bulk import</button>
+        <button class="btn btn-outline btn-sm" onclick="document.querySelector('[data-tab=paneCoupons]').click()">Add coupon</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="tabpane" id="paneProducts">
+    <div class="panel-card">
+      <h3 id="pfTitle">Add product</h3>
+      <form id="productForm">
+        <div class="form-grid">
+          <div class="field"><label>Product name *</label><input id="pfName" placeholder="e.g. ChatGPT Plus"></div>
+          <div class="field"><label>Category</label><select id="pfCategory"></select></div>
+          <div class="field"><label>Price (PKR)</label><input id="pfPrice" type="number" min="0" placeholder="4100"></div>
+          <div class="field"><label>Original price (PKR)</label><input id="pfOrig" type="number" min="0" placeholder="5600"></div>
+          <div class="field"><label>Validity</label><input id="pfValidity" placeholder="1 Month"></div>
+          <div class="field"><label>Stock</label><input id="pfStock" type="number" min="0" placeholder="20"></div>
+          <div class="field"><label>Sold count <span style="font-weight:400;color:#8a8271">(real sales only)</span></label><input id="pfSold" type="number" min="0" placeholder="0"></div>
+          <div class="field"><label><input id="pfTrial" type="checkbox" style="width:auto;margin-right:6px">🎁 Free Trial enabled</label></div>
+          <div class="field"><label><input id="pfBest" type="checkbox" style="width:auto;margin-right:6px">🔥 Best Seller badge</label></div>
+          <div class="field"><label><input id="pfStarting" type="checkbox" style="width:auto;margin-right:6px">💲 STARTING AT price (multiple packages)</label></div>
+          <div class="field"><label>Access type</label><input id="pfAccess" placeholder="e.g. Private Account / Shared Access / On Your Email"></div>
+          <div class="field"><label>Warranty line</label><input id="pfWarranty" placeholder="e.g. Warranty Included"></div>
+          <div class="field full"><label>Features (one per line)</label><textarea id="pfFeatures" placeholder="Premium access&#10;Delivered on WhatsApp after payment"></textarea></div>
+          <div class="field full"><label>About (2–3 lines)</label><textarea id="pfAbout" placeholder="Short description of the product…"></textarea></div>
+          <div class="field"><label>Image upload (PNG/JPG)</label><input id="pfImgFile" type="file" accept="image/*"><div id="pfImgPreview"></div></div>
+          <div class="field"><label>…or image URL / path</label><input id="pfImgUrl" placeholder="assets/img/posters/poster-chatgpt.webp"><div class="hint">Upload wins over URL. Images live in assets/img/posters/.</div></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-dark" type="submit" id="pfSubmit">Add product</button>
+          <button class="btn btn-outline" type="button" id="pfCancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="panel-card">
+      <h3>All products</h3>
+      <div style="overflow-x:auto">
+      <table class="admin-tbl">
+        <thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+        <tbody id="productRows"></tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- BULK IMPORT -->
+  <section class="tabpane" id="paneBulk">
+    <div class="panel-card">
+      <h3>Bulk import — one click</h3>
+      <p style="font-size:13.5px;color:#6b6455;margin-bottom:14px">
+        Upload a CSV with columns: <b>name, category, price, original_price, validity, stock, features, about, image_url</b>.
+        Separate multiple features with <b>|</b>. Download the template, fill 50–200 rows, import.
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-outline" id="dlTemplate">⬇ Download CSV template</button>
+      </div>
+      <div class="field" style="margin-top:16px;max-width:440px">
+        <label>CSV file</label>
+        <input type="file" id="bulkFile" accept=".csv,text/csv">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-dark" id="bulkImportBtn">⬆ Import products</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEBSITE TEXT -->
+  <section class="tabpane" id="paneText">
+    <div class="panel-card">
+      <h3>Website text</h3>
+      <form id="textForm"></form>
+      <div class="btn-row"><button class="btn btn-dark" type="submit" form="textForm">Save all</button></div>
+    </div>
+  </section>
+
+  <!-- HOMEPAGE -->
+  <section class="tabpane" id="paneHomepage">
+    <div class="panel-card">
+      <h3>Hero — trust chips &amp; stats</h3>
+      <div class="field"><label>Hero trust chips (one per line)</label><textarea id="hpChips" rows="3" placeholder="⚡ 45 Min Delivery&#10;🛡️ Warranty Included"></textarea></div>
+      <div class="form-grid" id="hpStats"></div>
+    </div>
+    <div class="panel-card">
+      <h3>Featured deal</h3>
+      <div class="form-grid">
+        <div class="field"><label>&nbsp;</label><label class="toggle"><input type="checkbox" id="hpDealOn"> Show featured deal</label></div>
+        <div class="field"><label>Product</label><select id="hpDealProduct"></select></div>
+        <div class="field"><label>Deal title</label><input id="hpDealTitle" placeholder="🔥 Featured Deal"></div>
+        <div class="field"><label>Badge</label><input id="hpDealBadge" placeholder="Admin Verified Deal"></div>
+        <div class="field full"><label>Deal points (one per line)</label><textarea id="hpDealPoints" rows="3"></textarea></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <h3>Trust bar &amp; popular searches</h3>
+      <div class="field"><label><input id="hpTrustOn" type="checkbox" style="width:auto;margin-right:6px"> Show trust bar</label></div>
+      <div class="field"><label>Trust bar text</label><input id="hpTrustBar"></div>
+      <div class="field"><label>Popular searches (one per line)</label><textarea id="hpPop" rows="3"></textarea></div>
+    </div>
+    <div class="panel-card">
+      <h3>Feature cards (Everything Included)</h3>
+      <div id="hpFeatures"></div>
+    </div>
+    <div class="panel-card">
+      <h3>FAQ</h3>
+      <div id="hpFaqs"></div>
+      <div class="btn-row"><button class="btn btn-outline btn-sm" id="hpFaqAdd" type="button">+ Add question</button></div>
+    </div>
+    <div class="panel-card">
+      <h3>Final CTA &amp; footer</h3>
+      <div class="form-grid">
+        <div class="field"><label>CTA title</label><input id="hpCtaTitle"></div>
+        <div class="field"><label>CTA text</label><input id="hpCtaText"></div>
+        <div class="field full"><label>Footer about text</label><textarea id="hpFooterAbout" rows="2"></textarea></div>
+        <div class="field full"><label>Footer trust strip</label><input id="hpFooterTrust"></div>
+        <div class="field full"><label>How to purchase — 3 steps (title | text, one per line)</label><textarea id="hpHowSteps" rows="6"></textarea></div>
+        <div class="field"><label>Support email (shown in footer)</label><input id="hpSupportEmail" placeholder="e.g. support@rehmattools.store"></div>
+        <div class="field full"><label>Refund &amp; warranty notice (footer)</label><textarea id="hpRefundNotice" rows="2"></textarea></div>
+        <div class="field"><label>&nbsp;</label><label class="toggle"><input type="checkbox" id="hpCouponWidget"> Show floating coupon widget</label></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <h3>Policies (footer links)</h3>
+      <div id="hpPolicies"></div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-dark" id="hpSave">Save homepage</button></div>
+  </section>
+
+  <!-- COURSES -->
+  <section class="tabpane" id="paneCourses">
+    <div class="panel-card">
+      <h3 id="cfTitle">Add course</h3>
+      <form id="courseForm">
+        <div class="form-grid">
+          <div class="field"><label>Course name *</label><input id="cfName" placeholder="e.g. YouTube Automation"></div>
+          <div class="field"><label>Category</label><input id="cfCategory" placeholder="e.g. YouTube Automation"></div>
+          <div class="field"><label>Price (PKR)</label><input id="cfPrice" type="number" min="0" placeholder="3000"></div>
+          <div class="field"><label>Original price (PKR, optional)</label><input id="cfOrig" type="number" min="0" placeholder="10000"></div>
+          <div class="field"><label>Validity</label><input id="cfValidity" placeholder="Lifetime Access"></div>
+          <div class="field"><label>Image URL / path</label><input id="cfImg" placeholder="assets/img/posters/poster-youtube.webp"></div>
+          <div class="field full"><label>Features (one per line)</label><textarea id="cfFeatures" placeholder="Complete step-by-step course&#10;Lifetime access"></textarea></div>
+          <div class="field full"><label>About (2–3 lines)</label><textarea id="cfAbout" placeholder="Short description of the course…"></textarea></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-dark" type="submit" id="cfSubmit">Add course</button>
+          <button class="btn btn-outline" type="button" id="cfCancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+    <div class="panel-card">
+      <h3>All courses</h3>
+      <div style="overflow-x:auto">
+      <table class="admin-tbl">
+        <thead><tr><th>Name</th><th>Price</th><th>Validity</th><th>Actions</th></tr></thead>
+        <tbody id="courseRows"></tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUPONS -->
+  <!-- Reviews -->
+  <section class="tabpane" id="paneReviews">
+    <div class="panel-card">
+      <h3>Customer Reviews</h3>
+      <p style="font-size:13px;color:#6b6455;margin-bottom:12px">Reviews submitted from the site appear here first as <b>pending</b> — approve only genuine ones. Approved reviews show on the homepage; pending ones stay hidden.</p>
+      <table class="admin-tbl">
+        <thead><tr><th>Name</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th></th></tr></thead>
+        <tbody id="reviewRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Proofs -->
+  <section class="tabpane" id="paneProofs">
+    <div class="panel-card">
+      <h3>WhatsApp Delivery Proofs</h3>
+      <p style="font-size:13px;color:#6b6455;margin-bottom:12px">Upload real delivery/activation screenshots. <b>Redact customer phone numbers, emails and bank IDs before uploading.</b></p>
+      <form id="proofForm">
+        <div class="form-grid">
+          <div class="field"><label>Screenshot *</label><input id="pfProofFile" type="file" accept="image/*"></div>
+          <div class="field"><label>Caption</label><input id="pfProofCaption" placeholder="e.g. ChatGPT Plus delivered on WhatsApp"></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-dark" type="submit">Upload Proof</button></div>
+      </form>
+      <div class="proofs-grid" id="proofRows" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <section class="tabpane" id="paneCoupons">
+    <div class="panel-card">
+      <h3>Add coupon</h3>
+      <form id="couponForm">
+        <div class="form-grid">
+          <div class="field"><label>Code</label><input id="cpCode" placeholder="EID10" style="text-transform:uppercase"></div>
+          <div class="field"><label>Percent off (1–99)</label><input id="cpPct" type="number" min="1" max="99" placeholder="10"></div>
+          <div class="field"><label>Scope</label><select id="cpScope"></select></div>
+          <div class="field"><label>&nbsp;</label><label class="toggle"><input type="checkbox" id="cpActive" checked> Active</label></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-dark" type="submit">Add coupon</button></div>
+      </form>
+    </div>
+    <div class="panel-card">
+      <h3>Active coupons</h3>
+      <div id="couponList"></div>
+    </div>
+  </section>
+
+  <!-- PAYMENTS -->
+  <section class="tabpane" id="panePayments">
+    <div class="panel-card">
+      <h3>Payment methods</h3>
+      <p style="font-size:13px;color:#6b6455;margin-bottom:12px">Methods with an empty number show <i>"Details will be shared on WhatsApp"</i> on the site. Untick "Show on site" to hide a method.</p>
+      <div id="payList"></div>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" id="payAdd">+ Add method</button>
+        <button class="btn btn-dark btn-sm" id="paySave">Save all</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="tabpane" id="paneSettings">
+    <div class="panel-card">
+      <h3>Change admin password</h3>
+      <form id="pwForm">
+        <div class="field" style="max-width:320px"><label>New password (min 6 chars)</label><input type="password" id="newPw"></div>
+        <div class="btn-row"><button class="btn btn-dark btn-sm" type="submit">Change password</button></div>
+      </form>
+    </div>
+    <div class="panel-card">
+      <h3>Backup &amp; restore</h3>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" id="exportBtn">⬇ Export data (JSON)</button>
+        <label class="btn btn-outline btn-sm" style="margin:0">⬆ Import data (JSON)<input type="file" id="importFile" accept=".json,application/json" style="display:none"></label>
+        <button class="btn btn-danger btn-sm" id="resetBtn">Reset to defaults</button>
+      </div>
+      <p style="font-size:12.5px;color:#8a8271;margin-top:12px">Data is stored in this browser's localStorage. Export regularly as backup.</p>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
