@@ -14,10 +14,16 @@
   /* ---------- helpers ---------- */
   function $(id) { return document.getElementById(id); }
   function waLink(text) { return window.RT.wa(S.whatsappNumber, text); }
-  // Image with graceful fallback (images are added to assets/img/posters later)
+  // Image with graceful fallback (competitor logos + posters)
   function imgTag(src, alt, cls) {
+    var fb = "assets/img/posters/poster-h-chatgpt.webp";
+    if (src && src.indexOf("logos/") !== -1) {
+      fb = src.replace("assets/img/logos/", "assets/img/posters/poster-h-").replace(".jpg", ".webp");
+    } else if (src && src.indexOf("posters/") !== -1) {
+      fb = src.replace("assets/img/posters/poster-h-", "assets/img/logos/").replace(".webp", ".jpg");
+    }
     return '<img src="' + esc(src) + '" alt="' + esc(alt) + '" class="' + (cls || "") + '"' +
-      ' onerror="this.outerHTML=\'<div class=&quot;img-fallback&quot;&gt;' + esc(alt.charAt(0).toUpperCase()) + '</div>\'">';
+      ' onerror="if(!this.dataset.fb){this.dataset.fb=\'1\';this.src=\'' + esc(fb) + '\';}else{this.outerHTML=\'<div class=&quot;img-fallback&quot;&gt;' + esc(alt.charAt(0).toUpperCase()) + '</div>\';}">';
   }
   function offPct(p) {
     if (!p.originalPrice || p.originalPrice <= p.price) return 0;
@@ -49,14 +55,66 @@
 
   /* ---------- 4. hero ---------- */
   function renderHero() {
-    $("heroKicker").textContent = S.heroKicker || "";
-    $("heroTitle").textContent = S.heroTitle || "";
-    $("heroSubtitle").textContent = S.heroSubtitle || "";
-    $("heroImg").innerHTML = imgTag(S.heroImage, "Offer");
-    var chips = (S.heroTrustChips || []).filter(Boolean);
-    $("heroChips").innerHTML = chips.map(function (c) {
-      return '<span class="hero-chip">' + esc(c) + "</span>";
-    }).join("");
+    if ($("heroKicker")) $("heroKicker").textContent = S.heroKicker || "MEGA DEAL";
+    if ($("heroTitle")) $("heroTitle").textContent = S.heroTitle || "Buy 2 Get 1 Free on all AI tools";
+    if ($("heroSubtitle")) $("heroSubtitle").textContent = S.heroSubtitle || "Premium AI tools at the lowest prices in Pakistan. Instant delivery on WhatsApp.";
+    
+    var heroImgEl = $("heroImg");
+    if (heroImgEl) {
+      var posterSrc = S.heroImage || "assets/img/posters/poster-h-chatgpt.webp";
+      if (!posterSrc.includes("-h-") && !posterSrc.includes("-p-")) {
+        posterSrc = "assets/img/posters/poster-h-chatgpt.webp";
+      }
+      heroImgEl.innerHTML = 
+        '<div class="hero-deal-card-3d">' +
+          '<div class="hero-card-shine-wrap">' +
+            '<div class="hero-live-badge">🔥 MEGA DEAL • 60% OFF</div>' +
+            '<img src="' + esc(posterSrc) + '" alt="ChatGPT Plus AI Suite" class="hero-featured-poster" onerror="this.src=\'assets/img/posters/poster-h-chatgpt.webp\'">' +
+            '<div class="hero-continuous-shine"></div>' +
+          '</div>' +
+          '<div class="hero-deal-footer">' +
+            '<div class="hero-deal-title-row">' +
+              '<span class="hero-deal-tag">⚡ LIMITED TIME OFFER</span>' +
+              '<span class="hero-deal-status">● Live Now</span>' +
+            '</div>' +
+            '<div class="hero-timer-box">' +
+              '<div class="hero-timer-title">ENDS IN:</div>' +
+              '<div class="hero-timer-digits">' +
+                '<div class="cd-slot"><span id="cdH">14</span><label>HRS</label></div>' +
+                '<span class="cd-colon">:</span>' +
+                '<div class="cd-slot"><span id="cdM">35</span><label>MIN</label></div>' +
+                '<span class="cd-colon">:</span>' +
+                '<div class="cd-slot"><span id="cdS">42</span><label>SEC</label></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      startHeroCountdown();
+    }
+
+    var chips = (S.heroTrustChips || ["⚡ 45 Min Delivery", "🛡️ Warranty Included", "💳 JazzCash / Easypaisa"]).filter(Boolean);
+    if ($("heroChips")) {
+      $("heroChips").innerHTML = chips.map(function (c) {
+        return '<span class="hero-chip">' + esc(c) + "</span>";
+      }).join("");
+    }
+  }
+
+  var cdTimerStarted = false;
+  function startHeroCountdown() {
+    if (cdTimerStarted) return;
+    cdTimerStarted = true;
+    var h = 14, m = 35, s = 42;
+    setInterval(function() {
+      s--;
+      if (s < 0) { s = 59; m--; }
+      if (m < 0) { m = 59; h--; }
+      if (h < 0) { h = 23; }
+      var hEl = $("cdH"), mEl = $("cdM"), sEl = $("cdS");
+      if (hEl) hEl.textContent = (h < 10 ? "0" : "") + h;
+      if (mEl) mEl.textContent = (m < 10 ? "0" : "") + m;
+      if (sEl) sEl.textContent = (s < 10 ? "0" : "") + s;
+    }, 1000);
   }
 
   /* ---------- 4b. stats strip ---------- */
@@ -153,375 +211,142 @@
     });
   }
   function cardHTML(p) {
-    var pct = offPct(p);
-    var badges = "";
-    if (p.bestSeller) badges += '<span class="best-badge">🔥 Best Seller</span>';
-    if (p.sold > 0) badges += '<span class="sold-badge">' + p.sold + " Sold</span>";
-    if (p.stock === 0) badges += '<span class="stock-badge">Stock End</span>';
-    if (p.trial && p.stock !== 0) badges += '<span class="trial-badge">🎁 Trial</span>';
-    var savePill = (pct > 0) ? '<span class="save-badge">Save ' + pct + "%</span>" : "";
+    var vars = p.variations || [{ duration: p.validity || '1 Month', price: p.price, oldPrice: p.originalPrice }];
+    var activeIdx = p.activeVariationIndex || 0;
+    var activeVar = vars[activeIdx] || vars[0];
+
+    var pct = (activeVar.oldPrice > activeVar.price) ? Math.round(((activeVar.oldPrice - activeVar.price) / activeVar.oldPrice) * 100) : 0;
+    
+    // Top-Left Badges (Competitor Style)
+    var tlBadges = [];
+    if (p.bestSeller || (p.sold && p.sold > 15) || p.id.indexOf("chatgpt") !== -1 || p.id.indexOf("canva") !== -1 || p.id.indexOf("surfshark") !== -1) {
+      tlBadges.push('<span class="card-badge is-bestseller">🔥 Best Seller</span>');
+    }
+    if (pct >= 15) {
+      tlBadges.push('<span class="card-badge is-save">Save ' + pct + '%</span>');
+    }
+
+    // Bottom image overlay badges (Competitor Style)
+    var stockText = (p.stock === 0) ? 'Out of Stock' : 'In Stock • 30-60m';
+    var dotColor = (p.stock === 0) ? '#EF4444' : '#22C55E';
+    var pkgText = (vars.length > 1) ? ('📦 ' + vars.length + ' Packages') : ('📦 ' + (activeVar.duration || '1 Month'));
+
     var meta = [];
     if (p.accessType) meta.push("🔒 " + esc(p.accessType));
     if (p.warranty) meta.push("🛡️ " + esc(p.warranty));
-    var priceTxt = (p.price > 0) ? window.RT.money(p.price) : "💬 Price on WhatsApp";
+
+    var priceTxt = (activeVar.price > 0) ? window.RT.money(activeVar.price) : "💬 Price on WhatsApp";
+    var oldPriceTxt = (activeVar.oldPrice > activeVar.price) ? '<span class="price-old" id="pold-' + esc(p.id) + '">' + window.RT.money(activeVar.oldPrice) + '</span>' : '';
+    
+    // Duration selector pills (1M, 6M, 12M etc.)
+    var durationPills = "";
+    if (vars.length > 1) {
+      durationPills = '<div class="card-duration-selector" data-id="' + esc(p.id) + '">';
+      for (var vi = 0; vi < vars.length; vi++) {
+        var v = vars[vi];
+        var isAct = (vi === activeIdx) ? ' active' : '';
+        durationPills += '<button type="button" class="dur-pill' + isAct + '" onclick="window.selectProductVariation(\'' + esc(p.id) + '\', ' + vi + ')" data-id="' + esc(p.id) + '" data-vi="' + vi + '">' + esc(v.label || v.duration) + '</button>';
+      }
+      durationPills += '</div>';
+    }
+
+    var waMsg = "A.o.a i want to discuss about " + p.name + " (" + activeVar.duration + ") for Rs. " + activeVar.price;
     var orderBtn = (p.stock === 0)
-      ? '<a class="btn btn-green" data-act="order" href="' + waLink("A.o.a, is " + p.name + " available?") + '" target="_blank" rel="noopener">💬 Ask on WhatsApp</a>'
-      : '<a class="btn btn-green" data-act="order" href="' + waLink("A.o.a i want to discuss about " + p.name) + '" target="_blank" rel="noopener">💬 Order on WhatsApp</a>';
+      ? '<a class="btn btn-green" id="wbtn-' + esc(p.id) + '" data-act="order" href="' + waLink("A.o.a, is " + p.name + " available?") + '" target="_blank" rel="noopener">💬 Ask on WhatsApp</a>'
+      : '<a class="btn btn-green" id="wbtn-' + esc(p.id) + '" data-act="order" href="' + waLink(waMsg) + '" target="_blank" rel="noopener">💬 Order on WhatsApp</a>';
+
+    var inWish = (typeof getWish === 'function' && getWish().indexOf(p.id) !== -1);
+
     return '<div class="card" data-id="' + esc(p.id) + '">' +
-      '<div class="card-img"><div class="card-badges">' + badges + "</div>" + savePill + imgTag(p.img, p.name) + "</div>" +
+      '<div class="card-img">' +
+        (tlBadges.length ? '<div class="card-badges-tl">' + tlBadges.join('') + '</div>' : '') +
+        '<div class="card-actions-tr">' +
+          '<button type="button" class="card-circle-btn" data-act="wish" data-id="' + esc(p.id) + '" title="Wishlist">' + (inWish ? '❤️' : '🤍') + '</button>' +
+          '<button type="button" class="card-circle-btn" data-act="details" title="View details">👁️</button>' +
+        '</div>' +
+        imgTag(p.img, p.name) +
+        '<div class="card-img-bottom-bar">' +
+          '<span class="card-stock-pill"><i class="stock-dot" style="background:' + dotColor + ';box-shadow:0 0 8px ' + dotColor + '"></i><span>' + stockText + '</span></span>' +
+          '<span class="card-pkg-pill" id="ppkg-' + esc(p.id) + '">' + esc(pkgText) + '</span>' +
+        '</div>' +
+      '</div>' +
       '<div class="card-body">' +
         '<div class="card-cat">' + esc(p.category || "") + "</div>" +
         '<div class="card-name">' + esc(p.name) + "</div>" +
         (meta.length ? '<div class="card-meta">' + meta.join(" • ") + "</div>" : "") +
         (p.about ? '<div class="card-desc">' + esc(p.about) + "</div>" : "") +
-        '<div class="price-block"><span class="price-label">' + (p.startingAt ? "STARTING AT" : "PLAN PRICE") + '</span>' +
-        '<div class="price-row"><span class="price">' + priceTxt + "</span>" +
-        (p.originalPrice > p.price ? '<span class="price-old">' + window.RT.money(p.originalPrice) + "</span>" : "") +
-        (p.validity ? '<span class="validity">🕐 ' + esc(p.validity) + "</span>" : "") +
-        "</div></div>" +
+        durationPills +
+        '<div class="price-block"><span class="price-label">' + (vars.length > 1 ? "SELECTED DURATION PRICE" : "PLAN PRICE") + '</span>' +
+        '<div class="price-row"><span class="price" id="pprice-' + esc(p.id) + '">' + priceTxt + "</span>" +
+        oldPriceTxt +
+        '<span class="validity" id="pval-' + esc(p.id) + '">🕐 ' + esc(activeVar.duration) + "</span></div></div>" +
         '<div class="card-actions">' +
-          '<button class="btn btn-outline" data-act="details">ⓘ View Details</button>' +
           orderBtn +
+          '<button class="btn btn-outline" data-act="quickadd" type="button" onclick="window.quickAddProductWithVariation(\'' + esc(p.id) + '\')">🛒 Add</button>' +
+          '<button class="btn btn-outline" data-act="details" type="button">Details</button>' +
         "</div>" +
-        '<div class="card-quick">' +
-          '<button class="btn btn-outline btn-sm" data-act="quickadd">＋ Quick Add</button>' +
-          '<button class="btn btn-outline btn-sm wish-btn' + (isWished(p.id) ? " wished" : "") + '" data-act="wish">' + (isWished(p.id) ? "♥ Wishlisted" : "♡ Wishlist") + "</button>" +
-        "</div>" +
-      "</div></div>";
+      "</div>" +
+    "</div>";
   }
-  function trialCardHTML(p) {
-    return '<div class="card" data-id="' + esc(p.id) + '">' +
-      '<div class="card-img"><span class="trial-badge">🎁 Free Trial</span>' + imgTag(p.img, p.name) + "</div>" +
-      '<div class="card-body">' +
-        '<div class="card-top"><div class="card-name">' + esc(p.name) + "</div></div>" +
-        '<div class="card-actions">' +
-          '<a class="btn btn-green" href="' + waLink("A.o.a, I want a FREE TRIAL of " + p.name) + '" target="_blank" rel="noopener">🎁 Request Free Trial</a>' +
-        "</div>" +
-      "</div></div>";
-  }
-  function renderTrial() {
-    var grid = $("trialGrid");
-    if (!grid) return;
-    var list = store.products.filter(function (p) { return p.trial; });
-    var sec = $("trial");
-    if (!list.length) { if (sec) sec.style.display = "none"; return; }
-    if (sec) sec.style.display = "";
-    grid.innerHTML = list.map(trialCardHTML).join("");
-  }
-  function renderProducts() {
-    var list = filteredProducts();
-    var cnt = $("prodCount");
-    if (cnt) cnt.textContent = "Showing " + list.length + " of " + store.products.length + " products";
-    $("couponStrip").style.display = "none";
-    // coupon strip: first active coupon (scope all, or matching this category filter)
-    var act = (S.coupons || []).filter(function (c) { return c.active; });
-    if (act.length) {
-      var c = act[0];
-      if (c.scope === "all" || state.cat === "All" || c.scope === state.cat) {
-        $("couponStrip").innerHTML = "🎟️ Use code <b>" + esc(c.code) + "</b> for <b>" + esc(c.percent) + "% off</b> — mention it on WhatsApp";
-        $("couponStrip").style.display = "block";
+
+  // Global helper for interactive duration selection
+  window.selectProductVariation = function(prodId, varIndex) {
+    var p = findProduct(prodId);
+    if (!p || !p.variations || !p.variations[varIndex]) return;
+    p.activeVariationIndex = varIndex;
+    var v = p.variations[varIndex];
+
+    // Update displayed price
+    var priceEl = document.getElementById('pprice-' + prodId);
+    if (priceEl) priceEl.innerText = window.RT.money(v.price);
+
+    // Update old price
+    var oldEl = document.getElementById('pold-' + prodId);
+    if (oldEl) {
+      if (v.oldPrice > v.price) {
+        oldEl.innerText = window.RT.money(v.oldPrice);
+        oldEl.style.display = 'inline';
+      } else {
+        oldEl.style.display = 'none';
       }
     }
-    $("productGrid").innerHTML = list.length
-      ? list.map(cardHTML).join("")
-      : '<p style="grid-column:1/-1;text-align:center;color:#8a8271;padding:30px">No products found. Try another search.</p>';
-    // wire buttons
-    var cards = $("productGrid").querySelectorAll(".card");
-    for (var i = 0; i < cards.length; i++) {
-      (function (card) {
-        var id = card.getAttribute("data-id");
-        card.querySelector('[data-act="details"]').addEventListener("click", function () { openDetails(id); });
-        var qa = card.querySelector('[data-act="quickadd"]');
-        if (qa) qa.addEventListener("click", function () {
-          addToCart(id);
-          var p = findProduct(id);
-          toastCart((p ? p.name : "Product") + " added to cart ✓");
-        });
-        var wb = card.querySelector('[data-act="wish"]');
-        if (wb) wb.addEventListener("click", function () { toggleWish(id); renderProducts(); });
-      })(cards[i]);
-    }
-  }
 
-  /* ---------- 7b. courses ---------- */
-  var courseState = { cat: "All", q: "" };
-  function courseCardHTML(c, rank) {
-    var feats = (c.features || []).map(function (f) { return "<li>" + esc(f) + "</li>"; }).join("");
-    var priceTxt = (c.price > 0) ? window.RT.money(c.price) : "Rs. 0";
-    var freeBadge = (c.price <= 0) ? '<span class="free-badge">100% FREE</span>' : "";
-    var rankBadge = rank ? '<span class="rank-badge">#' + rank + "</span>" : "";
-    var btn = (c.price <= 0)
-      ? '<a class="btn btn-green" href="' + waLink("A.o.a, I want to claim the FREE course: " + c.name) + '" target="_blank" rel="noopener">🎁 Claim Free</a>'
-      : '<a class="btn btn-green" href="' + waLink("A.o.a, I want to join the course: " + c.name) + '" target="_blank" rel="noopener">💬 Enroll on WhatsApp</a>';
-    return '<div class="card" data-id="' + esc(c.id || c.name) + '">' +
-      '<div class="card-img">' + rankBadge + freeBadge + imgTag(c.img || "assets/img/posters/poster-chatgpt.webp", c.name) + "</div>" +
-      '<div class="card-body">' +
-        '<div class="card-cat">' + esc(c.category || "COURSE") + "</div>" +
-        '<div class="card-name">' + esc(c.name) + "</div>" +
-        '<div class="card-desc">' + esc(c.about || "") + "</div>" +
-        '<ul class="course-feats">' + feats + "</ul>" +
-        '<div class="price-block"><span class="price-label">PLAN PRICE</span>' +
-        '<div class="price-row">' +
-        (c.originalPrice > c.price ? '<span class="price-old">' + window.RT.money(c.originalPrice) + "</span>" : "") +
-        '<span class="price">' + priceTxt + "</span>" +
-        (c.price <= 0 ? '<span class="free-pill">FREE</span>' : "") +
-        (c.validity ? '<span class="validity">🕐 ' + esc(c.validity) + "</span>" : "") +
-        "</div></div>" +
-        '<div class="card-actions">' + btn + "</div>" +
-      "</div></div>";
-  }
-  function filteredCourses() {
-    var q = courseState.q.trim().toLowerCase();
-    return (store.courses || []).filter(function (c) {
-      var okCat = courseState.cat === "All" || c.category === courseState.cat;
-      var okQ = !q || (c.name + " " + (c.category || "") + " " + (c.about || "")).toLowerCase().indexOf(q) !== -1;
-      return okCat && okQ;
-    });
-  }
-  function renderCourseCats() {
-    var cats = ["All"];
-    (store.courses || []).forEach(function (c) {
-      if (c.category && cats.indexOf(c.category) === -1) cats.push(c.category);
-    });
-    var el = $("courseCats");
-    if (!el) return;
-    el.innerHTML = cats.map(function (c) {
-      var n = c === "All" ? (store.courses || []).length : (store.courses || []).filter(function (x) { return x.category === c; }).length;
-      return '<button class="pill' + (courseState.cat === c ? " active" : "") + '" data-ccat="' + esc(c) + '">' + esc(c) + " (" + n + ")</button>";
-    }).join("");
-    var btns = el.querySelectorAll("button");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener("click", function () {
-        courseState.cat = this.getAttribute("data-ccat");
-        renderCourseCats(); renderCourses();
+    // Update validity
+    var valEl = document.getElementById('pval-' + prodId);
+    if (valEl) valEl.innerText = '🕐 ' + v.duration;
+
+    // Update WhatsApp link
+    var wbtn = document.getElementById('wbtn-' + prodId);
+    if (wbtn) {
+      var msg = "A.o.a i want to discuss about " + p.name + " (" + v.duration + ") for Rs. " + v.price;
+      wbtn.href = waLink(msg);
+    }
+
+    // Update active pill styling
+    var container = document.querySelector('.card-duration-selector[data-id="' + prodId + '"]');
+    if (container) {
+      var buttons = container.querySelectorAll('.dur-pill');
+      buttons.forEach(function(b, idx) {
+        if (idx === varIndex) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
       });
     }
-  }
-  function renderCourses() {
-    var grid = $("courseGrid");
-    var sec = $("courses");
-    var all = store.courses || [];
-    if (!all.length) { if (sec) sec.style.display = "none"; return; }
-    if (sec) sec.style.display = "";
-    var list = filteredCourses();
-    var cnt = $("courseCount");
-    if (cnt) cnt.textContent = list.length + " of " + all.length + " Courses";
-    grid.innerHTML = list.length
-      ? list.map(function (c, i) { return courseCardHTML(c, i + 1); }).join("")
-      : '<p style="grid-column:1/-1;text-align:center;color:#8a8271;padding:30px">No courses found. Try another search.</p>';
-  }
+  };
 
-  /* ---------- 7c. feature cards ---------- */
-  function renderFeatures() {
-    var list = (S.featureCards || []).filter(function (x) { return x && (x.title || x.text); });
-    var sec = $("featuresSec");
-    if (!list.length) { if (sec) sec.style.display = "none"; return; }
-    if (sec) sec.style.display = "";
-    $("featureGrid").innerHTML = list.slice(0, 6).map(function (x) {
-      return '<div class="feat-card"><div class="feat-icon">' + esc(x.icon || "✦") + '</div><h3>' + esc(x.title || "") + "</h3><p>" + esc(x.text || "") + "</p></div>";
-    }).join("");
-  }
+  // Quick add with active variation
+  window.quickAddProductWithVariation = function(prodId) {
+    var p = findProduct(prodId);
+    if (!p) return;
+    var vars = p.variations || [{ duration: p.validity || '1 Month', price: p.price }];
+    var activeVar = vars[p.activeVariationIndex || 0];
 
-  /* ---------- 8b. FAQ ---------- */
-  function renderFaq() {
-    var list = (S.faqs || []).filter(function (x) { return x && x.q; });
-    var sec = $("faqSec");
-    if (!list.length) { if (sec) sec.style.display = "none"; return; }
-    if (sec) sec.style.display = "";
-    $("faqList").innerHTML = list.map(function (x, i) {
-      return '<div class="faq-item"><button class="faq-q" data-faq="' + i + '">' + esc(x.q) + '<span class="faq-arrow">+</span></button>' +
-        '<div class="faq-a">' + esc(x.a || "") + "</div></div>";
-    }).join("");
-    var qs = $("faqList").querySelectorAll(".faq-q");
-    for (var i = 0; i < qs.length; i++) {
-      qs[i].addEventListener("click", function () {
-        var item = this.parentNode;
-        var open = item.classList.contains("open");
-        var all = $("faqList").querySelectorAll(".faq-item");
-        for (var j = 0; j < all.length; j++) all[j].classList.remove("open");
-        if (!open) item.classList.add("open");
-      });
-    }
-  }
+    addToCart(prodId, activeVar.duration, activeVar.price);
+    toastCart(p.name + " (" + activeVar.duration + ") added to cart ✓");
+  };
 
-  /* ---------- 8c. final CTA ---------- */
-  function renderCta() {
-    $("ctaTitle").textContent = S.ctaTitle || "";
-    $("ctaText").textContent = S.ctaText || "";
-    $("ctaWa").href = waLink("A.o.a, I need a custom quote");
-  }
-
-  /* ---------- 8. guidance band ---------- */
-  function renderGuidance() {
-    $("guidanceTitle").textContent = S.guidanceTitle || "";
-    $("guidanceText").textContent = S.guidanceText || "";
-    $("guidanceBtn").href = waLink("A.o.a mujhe guidance chahiye");
-  }
-
-  /* ---------- 9. reviews (genuine only — approved reviews, empty by default) ---------- */
-  var revTab = "all";
-  var revProdFilter = "All";
-  function approvedReviews() {
-    return (store.reviews || []).filter(function (r) { return r.approved; });
-  }
-  function starsHtml(rating) {
-    var n = Math.max(1, Math.min(5, Math.round(Number(rating) || 5)));
-    return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
-  }
-  function reviewCardHTML(r) {
-    return '<div class="rev-card">' +
-      '<div class="rev-head"><span class="rev-avatar">👤</span>' +
-        '<div><b>' + esc(r.name) + (r.city ? " <span class='rev-city'>(" + esc(r.city) + ")</span>" : "") + "</b>" +
-        '<div class="rev-stars">' + starsHtml(r.rating) + ' <span class="rev-score">' + (Number(r.rating) || 5).toFixed(1) + "</span></div>" +
-        (r.date ? '<div class="rev-date">📅 ' + esc(r.date) + "</div>" : "") + "</div></div>" +
-      '<div class="rev-text">"' + esc(r.comment) + '"</div>' +
-      (r.tool ? '<div class="rev-tool">🏷️ Product: <b>' + esc(r.tool) + "</b></div>" : "") +
-      "</div>";
-  }
-  function renderReviews() {
-    var list = approvedReviews();
-    var n = list.length;
-    var avg = n ? (list.reduce(function (a, r) { return a + (Number(r.rating) || 5); }, 0) / n) : 0;
-    var proofs = (store.proofs || []).length;
-    $("reviewsSub").textContent = n
-      ? "Browse " + n + " genuine customer review" + (n > 1 ? "s" : "") + " and " + proofs + " real WhatsApp delivery proof" + (proofs === 1 ? "" : "s") + (n ? " (" + avg.toFixed(1) + "/5 average rating)." : ".")
-      : "No reviews yet — every review here comes from a real customer after admin approval.";
-    // tabs
-    var tabs = [
-      ["all", "🌟 All Testimonials & Proofs"],
-      ["written", "✍️ Written Reviews (" + n + ")"],
-      ["proofs", "💬 WhatsApp Proof Gallery (" + proofs + ")"],
-      ["byproduct", "📦 Reviews by Product"]
-    ];
-    $("revTabs").innerHTML = tabs.map(function (t) {
-      return '<button class="pill' + (revTab === t[0] ? " active" : "") + '" data-rtab="' + t[0] + '">' + t[1] + "</button>";
-    }).join("");
-    var tb = document.querySelectorAll("[data-rtab]");
-    for (var i = 0; i < tb.length; i++) tb[i].addEventListener("click", function () {
-      revTab = this.getAttribute("data-rtab");
-      renderReviews();
-    });
-    // stats tiles
-    $("revStats").innerHTML =
-      '<div class="stat-tile"><b>' + n + '</b><span>Customer Reviews</span></div>' +
-      '<div class="stat-tile"><b>' + (n ? avg.toFixed(1) : "—") + '</b><span>Average Rating</span></div>' +
-      '<div class="stat-tile"><b>' + proofs + '</b><span>WhatsApp Proofs</span></div>' +
-      '<div class="stat-tile"><b>30-Day</b><span>Replacement Warranty</span></div>';
-    // rating breakdown (real counts only)
-    var counts = [0, 0, 0, 0, 0, 0];
-    list.forEach(function (r) { counts[Math.max(1, Math.min(5, Math.round(Number(r.rating) || 5)))]++; });
-    $("revBreakdown").innerHTML = n ? [5, 4, 3, 2, 1].map(function (st) {
-      var c = counts[st];
-      var pct = Math.round(c / n * 100);
-      return '<div class="break-row"><span>' + st + '★</span><div class="break-bar"><div style="width:' + pct + '%"></div></div><span>' + pct + "% (" + c + ")</span></div>";
-    }).join("") : "";
-    // product filter (by-product tab)
-    var rf = $("revFilter");
-    if (revTab === "byproduct") {
-      rf.style.display = "";
-      var tools = ["All"];
-      list.forEach(function (r) { if (r.tool && tools.indexOf(r.tool) === -1) tools.push(r.tool); });
-      $("revProduct").innerHTML = tools.map(function (t) {
-        return '<option value="' + esc(t) + '"' + (t === revProdFilter ? " selected" : "") + ">" + esc(t) + "</option>";
-      }).join("");
-    } else rf.style.display = "none";
-    // grid
-    var show = list;
-    if (revTab === "byproduct" && revProdFilter !== "All") show = list.filter(function (r) { return r.tool === revProdFilter; });
-    var grid = $("reviewGrid");
-    var pw = $("proofsWrap");
-    if (revTab === "proofs") {
-      grid.style.display = "none"; pw.style.display = "";
-      $("revEmpty").style.display = "none";
-      renderProofs();
-    } else {
-      grid.style.display = ""; pw.style.display = "none";
-      grid.innerHTML = show.map(reviewCardHTML).join("");
-      $("revEmpty").style.display = show.length ? "none" : "";
-    }
-  }
-  function renderProofs() {
-    var list = store.proofs || [];
-    $("proofsGrid").innerHTML = list.length ? list.map(function (x) {
-      return '<figure class="proof-card"><img src="' + esc(x.img) + '" alt="WhatsApp proof" loading="lazy">' +
-        (x.caption ? "<figcaption>" + esc(x.caption) + "</figcaption>" : "") + "</figure>";
-    }).join("") : '<p style="grid-column:1/-1;text-align:center;color:#8a8271;padding:30px">No delivery proofs uploaded yet.</p>';
-  }
-  function initReviewForm() {
-    var sel = $("rvProduct");
-    sel.innerHTML = store.products.map(function (p) {
-      return '<option value="' + esc(p.name) + '">' + esc(p.name) + "</option>";
-    }).join("");
-    $("writeReviewBtn").addEventListener("click", function () { openOverlay("reviewOverlay"); });
-    $("reviewClose").addEventListener("click", function () { closeOverlay("reviewOverlay"); });
-    $("reviewOverlay").addEventListener("click", function (e) { if (e.target === this) closeOverlay("reviewOverlay"); });
-    $("reviewForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var name = $("rvName").value.trim();
-      var comment = $("rvComment").value.trim();
-      if (!name || !comment) return;
-      var d = new Date();
-      (store.reviews = store.reviews || []).push({
-        name: name, city: $("rvCity").value.trim(),
-        tool: $("rvProduct").value, rating: Number($("rvRating").value) || 5,
-        comment: comment, approved: false,
-        date: d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-      });
-      window.Store.save(store);
-      $("rvMsg").style.display = "";
-      $("rvName").value = ""; $("rvCity").value = ""; $("rvComment").value = "";
-      setTimeout(function () { closeOverlay("reviewOverlay"); $("rvMsg").style.display = "none"; }, 2500);
-    });
-    $("revProduct").addEventListener("change", function () {
-      revProdFilter = this.value;
-      renderReviews();
-    });
-  }
-
-  /* ---------- 9b. how to purchase ---------- */
-  function renderHow() {
-    var steps = S.howSteps || [];
-    $("howSteps").innerHTML = steps.map(function (x, i) {
-      return '<div class="step-card"><span class="step-num">STEP ' + (i + 1) + "</span>" +
-        "<h3>" + esc(x.title || "") + "</h3><p>" + esc(x.text || "") + "</p></div>";
-    }).join("");
-    var pays = (S.paymentMethods || []).filter(function (m) { return m.visible !== false; });
-    var el = $("payAccounts");
-    if (el) el.innerHTML = pays.length ?
-      '<h3>💳 Official PKR Payment Accounts</h3><p>100% advance payment verification across JazzCash, Easypaisa, Nayapay &amp; Binance.</p>' +
-      '<div class="pay-pills">' + pays.map(function (m) {
-        return '<span class="pay-pill"><b>' + esc(m.name) + "</b> · " + esc(m.number || "") + (m.accountTitle ? " · " + esc(m.accountTitle) : "") + "</span>";
-      }).join("") + "</div>" : "";
-  }
-
-  /* ---------- 11. welcome modal ---------- */
-  var WELCOME_LINES = [
-    "🤝 Assalamu Alaikum & Welcome! We provide 100% trusted and verified AI tools with complete honesty and transparency.",
-    "📖 Allah Ta'ala farmatay hain: 'Aur aapas mein ek doosre ka maal na-haq tareeqay se mat khao' (Surah Al-Baqarah 2:188).",
-    "💳 Tamam orders ke liye advance payment lazmi hai — no payment means no order.",
-    "💚 Agar hum waada ki gayi service deliver na kar saken, to hum fair refund policy par yaqeen rakhte hain.",
-    "🛡️ Agar aapko koi bhi trust issue ho, to pareshan na hon — hum aapko full transparency ke sath payment-after-activation par tool dein ge."
-  ];
-  function initWelcome() {
-    $("welcomeTitle").textContent = S.welcomeTitle || "Welcome";
-    $("welcomeLines").innerHTML = WELCOME_LINES.map(function (l) { return "<p>" + esc(l) + "</p>"; }).join("");
-    var seen = false;
-    try { seen = localStorage.getItem("rt_welcome_seen") === "1"; } catch (e) {}
-    if (!seen) setTimeout(function () { openOverlay("welcomeOverlay"); }, 1200);
-    $("welcomeClose").addEventListener("click", closeWelcome);
-    $("welcomeOverlay").addEventListener("click", function (e) { if (e.target === this) closeWelcome(); });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { closeOverlay("welcomeOverlay"); closeOverlay("detailsOverlay"); }
-    });
-  }
-  function closeWelcome() {
-    try {
-      if ($("dontShow").checked) localStorage.setItem("rt_welcome_seen", "1");
-    } catch (e) {}
-    closeOverlay("welcomeOverlay");
-  }
-
-  /* ---------- 12. product details modal ---------- */
   function openDetails(id) {
     var p = null;
     for (var i = 0; i < store.products.length; i++) if (store.products[i].id === id) p = store.products[i];
@@ -870,3 +695,172 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
 })();
+
+
+
+/* ============================================================
+   REHMAT TOOLS — 1,056 COURSES VAULT SYSTEM (12 CATEGORIES)
+   ============================================================ */
+var ALL_COURSES = [];
+var COURSE_CATEGORIES = [];
+var activeCourseCat = 'All';
+var activeCourseSearch = '';
+var currentCoursePage = 1;
+var COURSES_PER_PAGE = 16;
+
+function initCoursesEngine() {
+  fetch('all_1056_courses.json')
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      ALL_COURSES = data.courses || [];
+      COURSE_CATEGORIES = data.categories || [];
+      renderCourseCats();
+      renderCoursesGrid();
+      setupCourseSearch();
+    })
+    .catch(function(err) {
+      console.log('Courses loading notice:', err);
+    });
+}
+
+function renderCourseCats() {
+  var catContainer = document.getElementById('courseCats');
+  if (!catContainer) return;
+
+  var html = '<button type="button" class="course-cat-pill active" onclick="setCourseCategory(\'All\', this)">🔥 All Courses (1,056)</button>';
+  for (var i = 0; i < COURSE_CATEGORIES.length; i++) {
+    var c = COURSE_CATEGORIES[i];
+    html += '<button type="button" class="course-cat-pill" onclick="setCourseCategory(\'' + c.id + '\', this)">' + c.icon + ' ' + c.label + ' (88)</button>';
+  }
+  catContainer.innerHTML = html;
+}
+
+window.setCourseCategory = function(catId, btn) {
+  var pills = document.querySelectorAll('.course-cat-pill');
+  pills.forEach(function(p) { p.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+
+  activeCourseCat = catId;
+  currentCoursePage = 1;
+  renderCoursesGrid();
+};
+
+function setupCourseSearch() {
+  var searchInput = document.getElementById('courseSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      activeCourseSearch = this.value.toLowerCase().trim();
+      currentCoursePage = 1;
+      renderCoursesGrid();
+    });
+  }
+}
+
+function getFilteredCourses() {
+  var list = ALL_COURSES;
+  if (activeCourseCat !== 'All') {
+    list = list.filter(function(c) { return c.category === activeCourseCat; });
+  }
+  if (activeCourseSearch) {
+    list = list.filter(function(c) {
+      return c.title.toLowerCase().indexOf(activeCourseSearch) !== -1 ||
+             c.baseTopic.toLowerCase().indexOf(activeCourseSearch) !== -1 ||
+             c.categoryLabel.toLowerCase().indexOf(activeCourseSearch) !== -1;
+    });
+  }
+  return list;
+}
+
+function renderCoursesGrid() {
+  var grid = document.getElementById('courseGrid');
+  var countEl = document.getElementById('courseCount');
+  if (!grid) return;
+
+  var filtered = getFilteredCourses();
+  if (countEl) {
+    countEl.textContent = 'Showing ' + Math.min(currentCoursePage * COURSES_PER_PAGE, filtered.length) + ' of ' + filtered.length + ' courses';
+  }
+
+  var visible = filtered.slice(0, currentCoursePage * COURSES_PER_PAGE);
+  if (!visible.length) {
+    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#8a8271;padding:30px">No courses found matching your search. Try another keyword.</p>';
+    return;
+  }
+
+  var html = visible.map(function(c) {
+    var imgPath = c.image.replace('public/courses/', 'assets/img/courses/');
+    return '<div class="course-card-box">' +
+      '<div class="course-banner-top">' +
+        '<img src="' + imgPath + '" alt="' + esc(c.title) + '" onerror="this.onerror=null; this.src=\'assets/img/posters/poster-h-chatgpt.webp\';">' +
+        '<span class="course-free-badge">100% Free</span>' +
+      '</div>' +
+      '<div style="padding: 18px; display: flex; flex-direction: column; flex: 1;">' +
+        '<span style="font-size: 11px; font-weight: 800; color: #2563EB; text-transform: uppercase; margin-bottom: 4px;">' + esc(c.categoryLabel) + '</span>' +
+        '<h4 style="font-size: 15px; font-weight: 800; color: #111827; margin-bottom: 8px; line-height: 1.3;">' + esc(c.title) + '</h4>' +
+        '<div style="font-size: 12px; color: #6B7280; margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;">' +
+          '<span>⏱️ ' + esc(c.hours) + '</span>' +
+          '<span>📚 ' + esc(c.lessons) + '</span>' +
+          '<span>👥 ' + esc(c.enrolled) + '</span>' +
+        '</div>' +
+        '<div style="border-top: 1px solid #E5E7EB; padding-top: 12px; margin-top: auto; display: flex; align-items: center; justify-content: space-between;">' +
+          '<div>' +
+            '<span style="font-size: 11px; color: #9CA3AF; text-decoration: line-through;">' + esc(c.oldPrice) + '</span>' +
+            '<div style="font-weight: 900; color: #16A34A; font-size: 14px;">FREE ACCESS</div>' +
+          '</div>' +
+          '<button type="button" class="btn btn-primary" onclick="openClaimCourseModal(\'' + c.id + '\')" style="padding: 8px 16px; font-size: 12px; border-radius: 999px;">' +
+            'Claim Free →' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Add load more button if items remain
+  if (visible.length < filtered.length) {
+    html += '<div style="grid-column: 1 / -1; text-align: center; margin-top: 24px;">' +
+      '<button type="button" class="btn btn-outline" onclick="loadMoreCoursesPage()" style="padding: 12px 30px; font-size: 13px; font-weight: 700; border-radius: 999px;">' +
+        'Load More Courses (' + (filtered.length - visible.length) + ' remaining) ↓' +
+      '</button>' +
+    '</div>';
+  }
+
+  grid.innerHTML = html;
+}
+
+window.loadMoreCoursesPage = function() {
+  currentCoursePage++;
+  renderCoursesGrid();
+};
+
+window.openClaimCourseModal = function(courseId) {
+  var c = ALL_COURSES.find(function(item) { return item.id === courseId; });
+  if (!c) return;
+
+  var customDrive = localStorage.getItem('rehmat_tools_custom_drive_url');
+  var finalDriveUrl = customDrive || c.driveFolderUrl;
+
+  var titleEl = document.getElementById('claimCourseTitle');
+  var catEl = document.getElementById('claimCourseCategory');
+  var metaEl = document.getElementById('claimCourseMeta');
+  var driveBtn = document.getElementById('btnClaimDriveLink');
+
+  if (titleEl) titleEl.innerText = c.title;
+  if (catEl) catEl.innerText = c.categoryLabel;
+  if (metaEl) metaEl.innerText = c.hours + ' • ' + c.lessons + ' • ' + c.enrolled;
+  if (driveBtn) driveBtn.href = finalDriveUrl;
+
+  var modal = document.getElementById('claimCourseModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeClaimCourseModal = function() {
+  var modal = document.getElementById('claimCourseModal');
+  if (modal) modal.style.display = 'none';
+};
+
+// Auto-boot courses engine on document ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCoursesEngine);
+} else {
+  initCoursesEngine();
+}

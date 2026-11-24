@@ -12,42 +12,35 @@ window.DEFAULT_PRODUCTS = [
     "slug": "chatgpt",
     "name": "ChatGPT Plus",
     "category": "AI Tools",
-    "price": 3500,
-    "originalPrice": null,
-    "validity": "1 Month (Private)",
-    "stock": 20,
+    "price": 1599,
+    "originalPrice": 2500,
+    "validity": "Semi Private (30 Days)",
+    "stock": 25,
     "trial": false,
     "features": [
-      "Official ChatGPT Plus ($25 plan)",
-      "Premium ChatGPT features access",
-      "Codex access and supported tools",
-      "Advanced AI capabilities",
-      "Coding, writing, research and productivity"
+      "Official ChatGPT Plus Plan ($25 Plan)",
+      "Semi Private Plan: Rs. 1,599 (30 Days)",
+      "Full Private Readymade Plan: Rs. 3,200 (30 Days)",
+      "Full Private includes Email, Password, 2FA & Full Access",
+      "GPT-4o, Canvas, Codex, DALL-E 3 & Voice Mode"
     ],
-    "about": "Official ChatGPT Plus 1-month plan with premium features and Codex access.",
+    "about": "Official ChatGPT Plus 30-day plan. Choose Semi Private (Rs. 1,599) or Full Private Readymade with Email, Password & 2FA (Rs. 3,200).",
     "img": "assets/img/logos/chatgpt-plus.jpg",
-    "oldPrice": 6500,
+    "oldPrice": 2500,
     "variations": [
       {
-        "duration": "1 Month (Private)",
-        "price": 3500,
+        "duration": "Semi Private (30 Days)",
+        "price": 1599,
+        "oldPrice": 2500,
+        "label": "Semi Private (30 Days)",
+        "badge": "Rs. 1,599"
+      },
+      {
+        "duration": "Full Private Readymade (30 Days) - Email, Pass & 2FA",
+        "price": 3200,
         "oldPrice": 6500,
-        "label": "1M",
-        "badge": "Official $25"
-      },
-      {
-        "duration": "3 Months Plan",
-        "price": 9500,
-        "oldPrice": 19500,
-        "label": "3M",
-        "badge": "Save 20%"
-      },
-      {
-        "duration": "6 Months Plan",
-        "price": 17500,
-        "oldPrice": 39000,
-        "label": "6M",
-        "badge": "Agency VIP"
+        "label": "Full Private (Email+2FA)",
+        "badge": "Rs. 3,200"
       }
     ],
     "activeVariationIndex": 0
@@ -2684,7 +2677,7 @@ window.DEFAULT_SETTINGS = {
 
 /* ---------- shared store helpers (used by site.js and admin.js) ---------- */
 window.Store = (function () {
-  var KEY = "rehmat_site_v5";
+  var KEY = "rehmat_site_v6";
   function deepCopy(o) { return JSON.parse(JSON.stringify(o)); }
   return {
     KEY: KEY,

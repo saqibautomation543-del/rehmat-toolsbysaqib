@@ -245,7 +245,7 @@
       for (var vi = 0; vi < vars.length; vi++) {
         var v = vars[vi];
         var isAct = (vi === activeIdx) ? ' active' : '';
-        durationPills += '<button type="button" class="dur-pill' + isAct + '" onclick="window.selectProductVariation(\'' + esc(p.id) + '\', ' + vi + ')" data-id="' + esc(p.id) + '" data-vi="' + vi + '">' + esc(v.duration) + '</button>';
+        durationPills += '<button type="button" class="dur-pill' + isAct + '" onclick="window.selectProductVariation(\'' + esc(p.id) + '\', ' + vi + ')" data-id="' + esc(p.id) + '" data-vi="' + vi + '">' + esc(v.label || v.duration) + '</button>';
       }
       durationPills += '</div>';
     }
